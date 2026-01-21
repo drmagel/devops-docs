@@ -1,0 +1,280 @@
+# DevOps Documentation Index
+
+This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
+
+## Table of Contents
+
+- [AWS Services](#aws-services)
+- [Kubernetes & EKS](#kubernetes--eks)
+- [Terraform](#terraform)
+- [Argo](#argo)
+- [Cell-Based Architecture](#cell-based-architecture)
+- [Network Fundamentals](#network-fundamentals)
+- [CNI (Container Network Interface)](#cni-container-network-interface)
+
+---
+
+## AWS Services
+
+### VPC Networking
+- **[Connect VPC to Internet](aws.md#connect-vpc-to-internet)** - Essential connectivity resources (Internet Gateway, Public Subnets, Elastic IP, NAT Gateway)
+- **[Transit Gateway](aws.md#transit-gateway)** - Hub-and-spoke router with native Network Firewall integration
+  - Topics: Centralized traffic inspection, firewall rule types, routing implementation
+
+### Lambda
+- **[Lambda's Roles and Policies](aws.md#lambdas-roles-and-policies)** - Execution roles, trust policies, resource-based policies
+- **[Lambda's Triggering Options](aws.md#lambdas-triggering-options)** - S3 events, message queues, synchronous triggers, schedules
+- **[Asynchronous Invocations](aws.md#asynchronous-invocations)** - Managed retry logic, destinations, error handling, concurrency
+
+### AWS Organizations & IAM
+- **[Organization Account](aws.md#organization-account)** - Management account, member accounts, workforce identities
+- **[IAM Identities](aws.md#iam-identities)** - Workforce identities, permission sets, IAM roles
+- **[Roles vs. Users vs. Groups](aws.md#roles-vs-users-vs-groups)** - Comparison table of IAM resources
+- **[Service Control Policies (SCPs)](aws.md#security-governance-service-control-policies-scps)** - Security governance and policy enforcement
+- **[Multi-Account Setup](aws.md#multi-account-setup)** - Account types and their purposes (Management, Security, Identity, Log Archive)
+
+---
+
+## Kubernetes & EKS
+
+### Core Kubernetes Concepts
+- **[Kubernetes Main Processes](kubernetes.md#kubernetes-main-processes)** - Control plane, worker nodes, helper processes
+  - Summary table: [Process Summary Table](kubernetes.md#summary-table)
+
+### AWS EKS Plugins
+- **[Core Networking Add-ons](kubernetes.md#1-core-networking-add-ons)** - VPC CNI, CoreDNS, Kube-proxy
+- **[Storage and Infrastructure Plugins](kubernetes.md#2-storage-and-infrastructure-plugins)** - Load Balancer Controller, EBS/EFS CSI Drivers, Karpenter
+- **[Security and Observability Add-ons](kubernetes.md#3-security-and-observability-add-ons)** - EKS Pod Identity, GuardDuty, ADOT, External Secrets
+- **[Community Add-ons Catalog](kubernetes.md#4-community-add-ons-catalog)** - Metrics Server, Cert-Manager, External-DNS
+- **[Metrics-Based Autoscalers](kubernetes.md#metrics-based-autoscalers)** - HPA, Metrics Server, KEDA, VPA, Karpenter comparison
+
+### EKS Topology & Architecture
+- **[Multi-Zonal (Single Cluster) Topology](kubernetes.md#1-multi-zonal-single-cluster-topology)** - Standard production setup
+- **[Multi-Cluster Topology](kubernetes.md#2-multi-cluster-topology-per-environment)** - Per-environment cluster separation
+- **[Multi-Account/Multi-Region Topology](kubernetes.md#3-multi-accountmulti-region-topology)** - Advanced isolation and failover
+- **[Networking Best Practices](kubernetes.md#4-networking-best-practices-for-topologies)** - IPv6 adoption, Cilium, private endpoints
+
+### Multi-Zonal Topology Limitations
+- **[Single Cluster Topology Limitations](kubernetes.md#single-cluster-topology-limitations)** - 8 key limitations and mitigations
+  - Topics: Zonal data gravity, inter-AZ costs, network latency, blast radius, scheduling complexity, IPv4 exhaustion, load balancer distribution
+- **[Multiple Cluster Topology Limitations](kubernetes.md#multiple-cluster-topology-limitations-cell-based-architecture)** - Comparison table (1 Multi-AZ Cluster vs 3 Independent Clusters)
+
+### AWS IAM Integration with Kubernetes
+- **[EKS Pod Identity](kubernetes.md#aws-service-account-for-pods-eks-pod-identity)** - Modern standard for granting Pods IAM permissions
+  - Includes: Terraform examples, Kubernetes implementation
+- **[IRSA (Legacy)](kubernetes.md#aws-service-account-for-pods-the-legacy-way-irsa-iam-roles-for-service-accounts)** - IAM Roles for Service Accounts
+- **[Comparison: EKS Pod Identity vs IRSA](kubernetes.md#comparison)** - Feature comparison table
+
+### Load Balancers
+- **[AWS EKS Application and Network Load Balancers](kubernetes.md#aws-eks-application-and-network-load-balancers)** - AWS Load Balancer Controller vs NGINX Ingress
+  - Comparison table: [NGINX vs AWS Load Balancer Controller](kubernetes.md#the-architecture-gateway-api)
+- **[NGINX Ingress Controller (Legacy)](kubernetes.md#nginx-ingress-controller-legacy)** - Legacy implementation examples
+- **[AWS Load Balancer Controller (2026 Standard)](kubernetes.md#aws-load-balancer-controller-2026-standard)** - Modern implementation with Gateway API
+
+### Pod Management
+- **[Pod Topology Spread Constraints](kubernetes.md#pod-topology-spread-constraints)** - Distribution control across failure domains
+  - Examples: Balanced distribution, zone-sticky StatefulSet
+- **[Network Policy](kubernetes.md#network-policy)** - FQDN-based egress rules for EKS
+- **[Pod Disruption Budget (PDB)](kubernetes.md#pod-disruption-budget-pdb)** - Availability protection during voluntary disruptions
+  - Examples: minAvailable, maxUnavailable
+
+---
+
+## Terraform
+
+### Locals and Loops
+- **[The `locals {}` Block](terraform.md#the-locals--block)** - Internal variable storage and calculations
+- **[The `for_each` Meta-Argument](terraform.md#the-for_each-meta-argument)** - Creating multiple resource instances
+- **[The `for` Expression](terraform.md#the-for-expression)** - Transforming and filtering collections
+- **[Summary Table](terraform.md#summarize)** - Quick reference for locals, for_each, and for loops
+
+### Variable Types
+- **[Variable Types Overview](terraform.md#variable-types)** - List, Map, Set, Tuple comparison
+  - Detailed comparison table: [Variable Types Comparison](terraform.md#variable-types)
+  - Quick reference table: [Variable Types Quick Reference](terraform.md#variable-types)
+- **[Examples Snippets](terraform.md#examples-snippets)** - Practical examples for each type
+  - Topics: List (ordered), Map (lookup tables), Set (unique values), Tuple (mixed types)
+- **[Complex Example](terraform.md#complex-example)** - Security Group Rules with nested structures
+- **[Summary of References](terraform.md#summary-of-references)** - Syntax for accessing resource instances
+
+### Built-in Functions
+- **[Function Categories](terraform.md#built-in-function)** - Numeric, String, Collection, Filesystem, IP Network, Encoding & Crypto, Type Conversion
+  - Category table: [Function Categories Table](terraform.md#documentation-overview)
+- **[Terraform Console](terraform.md#documentation-overview)** - Interactive function testing
+
+### Resource Dependencies
+- **[Implicit Dependencies](terraform.md#implicit-dependencies)** - Terraform-native dependency handling
+- **[Explicit Dependencies (`depends_on`)](terraform.md#explicit-dependencies-depends_on)** - Manual dependency specification
+- **[Dependencies with `for_each`](terraform.md#dependencies-with-for_each)** - Handling dependencies in loops
+- **[Best Practices](terraform.md#best-practices)** - Guidelines for dependency management
+
+---
+
+## Argo
+
+### Core Argo Products
+- **[Overview](argo.md#core-argo-products)** - Argo CD, Argo Workflows, Argo Rollouts, Argo Events
+
+### Argo CD
+- **[Core Concepts & Patterns](argo.md#core-concepts--patterns)** - App-of-Apps Pattern, ApplicationSets
+- **[Best Practices](argo.md#best-practices)** - Repository separation, directory-based environments, secret management, SSO & RBAC, sync waves, drift detection
+
+### ApplicationSet
+- **[ApplicationSet Overview](argo.md#argo-applicationset)** - Generator, Template, Controller concepts
+- **[Primary Generators](argo.md#primary-generators)** - Git, Cluster, List, SCM Provider, Matrix generators
+- **[ApplicationSet vs. App-of-Apps](argo.md#applicationset-vs-app-of-apps)** - Comparison table
+- **[ApplicationSet Manifest Example](argo.md#applicationset-manifest-example-matrix-generator-manifest)** - Matrix Generator with Git and Cluster generators
+
+### Cluster Registration
+- **[Method 1: Argo CD CLI](argo.md#method-1-argo-cd-cli)** - Command-line cluster registration
+- **[Method 2: Declarative Secret](argo.md#method-2-declarative-secret)** - Kubernetes Secret-based registration
+- **[Key Considerations](argo.md#key-considerations)** - Security, service account tokens, ApplicationSets, local cluster
+- **[Declarative Auto Registration](argo.md#declarative-auto-registration)** - Local cluster discovery setup
+
+---
+
+## EKS Cell-Based Architecture
+
+### Architecture Pattern
+- **[Shared ALB](eks-cell-based-architecture.md#the-architecture-pattern-shared-alb)** - Central Application Load Balancer for multiple EKS clusters
+
+### Implementation
+- **[Central Infrastructure](eks-cell-based-architecture.md#a-central-infrastructure)** - ALB and Target Group setup
+- **[Cluster-Level Configuration](eks-cell-based-architecture.md#b-cluster-level-configuration)** - TargetGroupBinding setup
+- **[Service-Level Configuration](eks-cell-based-architecture.md#c-service-level-configuration)** - Service and TargetGroupBinding manifests
+
+### Load Balancing
+- **[Achieving Round-Robin](eks-cell-based-architecture.md#achieving-round-robin)** - ALB round-robin distribution
+- **[Health-Check Driven Failover](eks-cell-based-architecture.md#why-this-is-the-expert-choice)** - Automatic failover capabilities
+- **[Critical Caveat: Sticky Sessions](eks-cell-based-architecture.md#critical-caveat-the-sticky-session-trap)** - Session stickiness considerations
+- **[Summary of Component Jobs](eks-cell-based-architecture.md#summary-of-component-jobs)** - Component responsibilities table
+
+### Terraform Infrastructure
+- **[Application Load Balancer](eks-cell-based-architecture.md#applicaiton-load-balancer)** - ALB resource configuration
+- **[Target Group](eks-cell-based-architecture.md#target-group)** - Target group with IP targeting
+- **[The Listener](eks-cell-based-architecture.md#the-listener)** - ALB listener configuration
+- **[The Output](eks-cell-based-architecture.md#the-output-integration-value)** - Target Group ARN output for integration
+
+### Global Redis Cache
+- **[Key Implementation Patterns](eks-cell-based-architecture.md#1-key-implementation-patterns)** - Cross-zone and cross-region patterns
+  - Topics: Cross-Zone (Single Region), Cross-Region Global Datastore
+- **[Python Code](eks-cell-based-architecture.md#python-code)** - Redis client implementation example
+- **[Best Practices](eks-cell-based-architecture.md#best-practices)** - Engine choice, serverless vs node, persistence, security
+
+### Zonal Read Isolation
+- **[Identify Node Endpoints](eks-cell-based-architecture.md#a-identify-node-endpoints)** - Direct node addressing for zone-specific reads
+- **[Configuration Injection per EKS Cluster](eks-cell-based-architecture.md#b-configuration-injection-per-eks-cluster)** - Environment variable injection
+- **[Terraform Example](eks-cell-based-architecture.md#terrafom-example)** - ElastiCache replication group with zonal isolation
+- **[Output Example](eks-cell-based-architecture.md#output-examle)** - Redis node endpoints output
+
+---
+
+## Network Fundamentals
+
+### TCP/IP Protocol
+- **[TCP/IP Protocol Overview](network.md#ip-protocol-overview)** - TCP and UDP protocols explained
+  - Topics: TCP three-way handshake, UDP characteristics, use cases
+- **[TCP/IP Model Layers](network.md#tcpip-model-layers)** - Five-layer network model
+  - Layers: Application, Transport, Internet (Network), Data Link, Physical
+  - Protocol table: [TCP/IP Model Layers Table](network.md#tcpip-model-layers)
+
+---
+
+## CNI (Container Network Interface)
+
+### CNI Overview
+- **[CNI Types and Characteristics](cni.md#cnis)** - Overview of CNI plugins and selection criteria
+- **[Popular CNI Types & Characteristics](cni.md#popular-cni-types--characteristics)** - Comparison table of major CNI plugins
+  - CNIs: Cilium, Calico, Flannel, Canal, Weave Net
+- **[Specialized & Cloud-Native CNIs](cni.md#specialized--cloud-native-cnis)** - Cloud provider CNIs and specialized solutions
+- **[Core Network Models](cni.md#core-network-models)** - Overlay vs Underlay networking
+- **[Selection Criteria](cni.md#selection-criteria)** - Security, performance, scalability, kernel support considerations
+
+### eBPF
+- **[What is eBPF?](cni.md#what-is-ebpf)** - Extended Berkeley Packet Filter explained
+  - Topics: Safety, efficiency, hook-based architecture
+- **[eBPF vs. iptables Comparison](cni.md#ebpf-vs-iptables-comparison)** - Feature comparison table
+  - Comparison: Search mechanism, performance, latency, updates, observability, security scope, compatibility
+- **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)** - Comprehensive CNI data plane comparison
+  - Technologies: eBPF, iptables, OVS, IPVS, VXLAN, VPC/VNet Native, DPDK/VPP
+- **[Technology Summaries](cni.md#technology-summaries)** - Overview of data plane technologies
+
+---
+
+## Quick Reference Tables
+
+### Kubernetes Processes
+- **[Process Summary Table](kubernetes.md#summary-table)**
+
+### Autoscaling Components
+- **[Metrics-Based Autoscalers](kubernetes.md#metrics-based-autoscalers)**
+
+### Topology Comparison
+- **[Multi-AZ vs Multi-Cluster](kubernetes.md#multiple-cluster-topology-limitations-cell-based-architecture)**
+
+### IAM Methods Comparison
+- **[EKS Pod Identity vs IRSA](kubernetes.md#comparison)**
+
+### Load Balancer Comparison
+- **[NGINX vs AWS Load Balancer Controller](kubernetes.md#the-architecture-gateway-api)**
+
+### IAM Resources
+- **[Roles vs Users vs Groups](aws.md#roles-vs-users-vs-groups)**
+
+### Multi-Account Setup
+- **[Account Types](aws.md#multi-account-setup)**
+
+### ArgoCD Patterns
+- **[App-of-Apps vs ApplicationSet](argo.md#applicationset-vs-app-of-apps)**
+
+### Terraform Types
+- **[Variable Types Comparison](terraform.md#variable-types)**
+
+### Terraform Functions
+- **[Function Categories](terraform.md#documentation-overview)**
+
+### Cell Architecture Components
+- **[Component Jobs](eks-cell-based-architecture.md#summary-of-component-jobs)**
+
+### Redis Best Practices
+- **[ElastiCache Best Practices](eks-cell-based-architecture.md#best-practices)**
+
+### Network Layers
+- **[TCP/IP Model Layers](network.md#tcpip-model-layers)**
+
+### CNI Plugins
+- **[Popular CNI Types & Characteristics](cni.md#popular-cni-types--characteristics)**
+- **[eBPF vs. iptables Comparison](cni.md#ebpf-vs-iptables-comparison)**
+- **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)**
+
+---
+
+## Contributing
+
+When adding new documentation:
+1. Add content to the appropriate markdown file
+2. Update this README with the new topic and location
+3. Maintain consistent formatting and structure
+4. Include code examples where applicable
+5. Add comparison tables for related concepts
+
+---
+
+## File Structure
+
+```
+devops-docs/
+├── README.md                          # This index file
+├── aws.md                             # AWS services and best practices
+├── kubernetes.md                      # Kubernetes and EKS documentation
+├── terraform.md                       # Terraform tips and tricks
+├── argo.md                            # Argo CD and related tools
+├── eks-cell-based-architecture.md     # Cell-based architecture patterns
+├── network.md                         # Network fundamentals and TCP/IP
+├── cni.md                             # CNI plugins and eBPF
+└── github-actions.md                  # GitHub Actions (placeholder)
+```
+
+---
+
+*Last updated: 2026*
