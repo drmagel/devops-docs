@@ -4,8 +4,8 @@
 
 - **Argo CD (Continuous Delivery)**: A declarative, GitOps tool used for automated application deployment. It uses Git repositories as the "single source of truth" and ensures the live state of a Kubernetes cluster matches the desired state defined in Git.
 - **Argo Workflows (Workflow Automation)**: A container-native engine used to orchestrate parallel jobs on Kubernetes. It is widely used for CI/CD pipelines, complex data processing, and machine learning (ML) tasks.
-- **Argo Rollouts** (Progressive Delivery): An advanced deployment controller that provides capabilities beyond standard Kubernetes rolling updates, such as Blue-Green and Canary deployments. It integrates with service meshes and ingress controllers to manage traffic shifting during updates.
-- **Argo Events (Event-Driven Automation)**: A framework for managing event-based dependencies in Kubernetes. It can trigger actions (like starting an Argo Workflow) in response to external events such as webhooks, file changes, or schedules.
+- **Argo Rollouts** (Progressive Delivery): An advanced deployment controller that provides capabilities beyond standard Kubernetes rolling updates, such as **Blue-Green** and **Canary** deployments. It integrates with service meshes and ingress controllers to manage traffic shifting during updates.
+- **Argo Events (Event-Driven Automation)**: A framework for managing event-based dependencies in Kubernetes. It can trigger actions (like starting an Argo Workflow) in response to external events such as **webhooks**, **file changes**, or **schedules**.
 
 ## Argo CD
 Argo CD is a declarative GitOps continuous delivery tool for Kubernetes that uses Git as the "single source of truth" for application state. By 2026, it remains the industry standard for managing containerized workloads through automated synchronization between Git and live clusters.
@@ -13,8 +13,8 @@ Argo CD is a declarative GitOps continuous delivery tool for Kubernetes that use
 #### Core Concepts & Patterns
 
 - **App-of-Apps Pattern**: A deployment strategy where a single "parent" Argo CD Application manages and deploys multiple "child" Applications.
-  - **Purpose**: Ideal for cluster bootstrapping or managing environment-wide sets of tools (e.g., Ingress, Cert-Manager, Monitoring).
-  - **Scaling**: Recommended for smaller stacks (roughly 10 or fewer apps); larger environments often transition to ApplicationSets for dynamic, template-driven management.
+  - **Purpose**: Ideal for cluster bootstrapping or managing environment-wide sets of tools (e.g., **Ingress**, **Cert-Manager**, **Monitoring**).
+  - **Scaling**: Recommended for smaller stacks (roughly **10** or fewer apps); larger environments often transition to **ApplicationSets** for dynamic, template-driven management.
 - **ApplicationSets**: An evolution of the App-of-Apps pattern, allowing you to use a single manifest to target multiple clusters or deploy multiple apps from different repositories simultaneously using "Generators"
 
 #### Best Practices
@@ -23,7 +23,7 @@ To maintain a production-ready environment, follow these architectural and secur
 - **Repository Separation**: Maintain distinct Git repositories for application source code and Kubernetes configuration. This prevents infinite CI build loops and allows for granular access control.
 - **Directory-Based Environments**: Use folders (e.g., /prod, /staging) within your configuration repo rather than long-lived Git branches to model environments.
 - **Secure Secret Management**: Do not store plaintext secrets in Git. Use tools like Sealed Secrets, SOPS, or the Argo CD Vault Plugin to manage credentials externally or encrypt them in-repo.
-- **Harden Access (SSO & RBAC)**: Disable the local "admin" user immediately. Integrate with OIDC/SSO (e.g., Okta, Google) and use Argo CD AppProjects to restrict which teams can deploy to specific namespaces or clusters.
+- **Harden Access (SSO & RBAC)**: Disable the local "admin" user immediately. Integrate with OIDC/SSO (e.g., Okta, Google) and use **Argo CD AppProjects** to restrict which teams can deploy to specific namespaces or clusters.
 - **Declarative Infrastructure**: Use **Sync Waves** (annotations) to control the order of application deployment, ensuring dependencies like databases are ready before applications.
 - **Automated Drift Detection**: Enable **Self-Heal** and **Auto-Prune** in your sync policies to automatically reconcile the cluster when it drifts from the Git definition or when resources are deleted in Git. 
 
@@ -51,10 +51,10 @@ While both patterns manage multiple apps, they serve different needs:
 
 | Feature | App-of-Apps Pattern | ApplicationSet |
 |---------|---------------------|----------------|
-| Mechanism | A "Parent" app pointing to a folder of "Child" apps. | A dedicated controller that "renders" apps from a template. |
-| Scalability | Manual creation of each child manifest in Git. | Fully automated; new clusters or folders are detected instantly. |
-| Multi-Cluster | Requires unique manifests for each cluster destination. | One manifest can target N clusters using the Cluster Generator. |
-| Self-Service | Difficult to restrict what developers can change. | High security; admins can lock the "template" and only let devs change Git paths. |
+| **Mechanism** | A "Parent" app pointing to a folder of "Child" apps. | A dedicated controller that "renders" apps from a template. |
+| **Scalability** | Manual creation of each child manifest in Git. | Fully automated; new clusters or folders are detected instantly. |
+| **Multi-Cluster** | Requires unique manifests for each cluster destination. | One manifest can target N clusters using the Cluster Generator. |
+| **Self-Service** | Difficult to restrict what developers can change. | High security; admins can lock the "template" and only let devs change Git paths. |
 
 #### ApplicationSet Manifest Example (Matrix Generator Manifest)
 
@@ -103,7 +103,7 @@ spec:
 
 #### Register cluster to Argo CD
 
-Let's assume we have external Argo CD server that servers multiple clusters
+Let's assume we have external Argo CD server that serves multiple clusters
 
 ##### Method 1: Argo CD CLI
 1. Login to Argo CD:

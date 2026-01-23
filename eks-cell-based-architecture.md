@@ -86,14 +86,14 @@ If your application requires **Session Stickiness** (Cookie-based affinity), the
 
 | Component | Job |
 |-----------|-----|
-| Route 53 | Points your domain to the ALB DNS name. |
-| Shared ALB | The single entry point; performs the Round-Robin logic. |
-| Target Group | A unified pool of all healthy Pod IPs from all 3 clusters. |
-| LB Controller | Keeps the ALB updated as Pods scale up/down in each cluster. |
+| **Route 53** | Points your domain to the ALB DNS name. |
+| **Shared ALB** | The single entry point; performs the Round-Robin logic. |
+| **Target Group** | A unified pool of all healthy Pod IPs from all 3 clusters. |
+| **LB Controller** | Keeps the ALB updated as Pods scale up/down in each cluster. |
 
-## Terraforms
+## Terraform Examples
 
-### Applicaiton Load Balancer
+### Application Load Balancer
 
 ```hcl
 # Security Group for the ALB
@@ -171,7 +171,7 @@ resource "aws_lb_listener" "http" {
 
 ### The output (integration value)
 
-Once Terraform applies this, you will have a Target Group ARN. You provide this ARN to your GitHub Actions or Helm Values so that each of your 3 EKS clusters can deploy its `TargetGroupBinding`.
+Once Terraform applies this, you will have a **Target Group ARN**. You provide this ARN to your GitHub Actions or Helm Values so that each of your 3 EKS clusters can deploy its `TargetGroupBinding`.
 
 ```hcl
 output "target_group_arn" {
@@ -181,9 +181,19 @@ output "target_group_arn" {
 ```
 
 ## Global Redis Cache
-[AWS Blog: Valkey and Redis Locality](AWS Blog: Valkey and Redis Locality)
+[AWS Blog: Valkey and Redis Locality](https://aws.amazon.com/blogs/database/reduce-your-amazon-elasticache-costs-by-up-to-60-with-valkey-and-cudos)
 
 A **Global Redis Cache** (specifically the **Amazon ElastiCache Global Datastore**) is a managed architectural pattern used to sync data across different AWS Regions or independent "Cell" clusters.
+
+**Key Technical Comparisons (Valkey vs. Redis OSS)**  
+
+| Feature | Valkey (v8.0/8.1) | Redis OSS (v7.2 and prior) |
+|---------|-------------------|---------------------------|
+| **Throughput** | Up to 1.2 million queries per second (QPS) on a single node; ~230% higher than predecessor. | Typically lower; Redis 8.0 enhancements claim ~112% improvement but often lag behind Valkey's architecture in high-concurrency. |
+| **Threading Model** | Concurrent main and I/O threads; I/O threads handle parsing, writing, and memory deallocation. | Multi-threaded I/O (since v6.0) offloads socket I/O but keeps data manipulation single-threaded. |
+| **Memory Efficiency** | ~20–40% lower memory usage due to a new hash table design inspired by "Swiss tables". | Standard dictionary implementation with higher overhead per key-value entry. |
+| **Latency** | Up to 70% lower latency. P99 latency remains stable even under aggressive scaling. | Can experience higher latency spikes during cluster leadership changes or scaling. |
+| **Pricing on AWS** | 20% lower for node-based clusters; 33% lower for ElastiCache Serverless. | Standard managed service pricing. |
 
 ### 1. Key Implementation Patterns
 
@@ -226,29 +236,31 @@ r.set('session:user_123', '{"user": "kuku", "role": "admin"}', ex=3600)
 
 | Feature | Best Practice |
 |---------|---------------|
-| Engine Choice | Use Valkey 7.2+ or Redis OSS 7.1+. Valkey is the 2026 community standard for high performance. |
-| Serverless vs. Node | Use ElastiCache Serverless for PoCs or variable loads. It auto-scales and eliminates the need to manage shards manually. |
-| Persistence | Use Data Tiering (r6gd/r7g nodes) if your cache is large (>500GB). It stores less-frequently used data on NVMe SSDs to save 60% on costs. |
-| Security | Always enable Encryption in Transit (TLS) and Encryption at Rest. Use IAM Authentication instead of static passwords. |
+| **Engine Choice** | Use Valkey 7.2+ or Redis OSS 7.1+. Valkey is the 2026 community standard for high performance. |
+| **Serverless vs. Node** | Use ElastiCache Serverless for PoCs or variable loads. It auto-scales and eliminates the need to manage shards manually. |
+| **Persistence** | Use Data Tiering (r6gd/r7g nodes) if your cache is large (>500GB). It stores less-frequently used data on NVMe SSDs to save 60% on costs. |
+| **Security** | Always enable Encryption in Transit (TLS) and Encryption at Rest. Use IAM Authentication instead of static passwords. |
 
 ## Zonal Read Isolation
 
 To ensure each cell reads only from its local zone, bypass the shared endpoint and use Direct Node Addressing.
 
 ### A: Identify Node Endpoints
+
 Instead of using the cluster's general Reader Endpoint, you find the unique DNS endpoint for each individual replica node.
 - **Node 1 (AZ-1)**: `my-cache-001.abc.use1.cache.amazonaws.com`
 - **Node 2 (AZ-2)**: `my-cache-002.abc.use1.cache.amazonaws.com`
 - **Node 3 (AZ-3)**: `my-cache-003.abc.use1.cache.amazonaws.com`
 
 ### B: Configuration Injection per EKS Cluster
+
 In your CI/CD pipeline, inject the specific node endpoint as an Environment Variable unique to each EKS cluster:
 
 - **Cluster 1 (AZ-1) Config**: `REDIS_READER_HOST="my-cache-001..."`
 - **Cluster 2 (AZ-2) Config**: `REDIS_READER_HOST="my-cache-002..."`
 - **Cluster 3 (AZ-3) Config**: `REDIS_READER_HOST="my-cache-003..."`
 
-### Terrafom example
+### Terraform example
 
 ```hcl
 # 1. Subnet Group spanning 3 AZs
@@ -301,7 +313,7 @@ output "redis_node_endpoints" {
   ]
 }
 ```
-### Output examle:
+### Output example:
 
 ```hcl
 redis_node_endpoints = [

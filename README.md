@@ -1,6 +1,6 @@
 # DevOps Documentation Index
 
-This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
+This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
 
 ## Table of Contents
 
@@ -8,9 +8,10 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - [Kubernetes & EKS](#kubernetes--eks)
 - [Terraform](#terraform)
 - [Argo](#argo)
-- [Cell-Based Architecture](#cell-based-architecture)
+- [EKS Cell-Based Architecture](#eks-cell-based-architecture)
 - [Network Fundamentals](#network-fundamentals)
 - [CNI (Container Network Interface)](#cni-container-network-interface)
+- [GitHub Actions](#github-actions)
 
 ---
 
@@ -150,7 +151,8 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[Summary of Component Jobs](eks-cell-based-architecture.md#summary-of-component-jobs)** - Component responsibilities table
 
 ### Terraform Infrastructure
-- **[Application Load Balancer](eks-cell-based-architecture.md#applicaiton-load-balancer)** - ALB resource configuration
+- **[Terraform Examples](eks-cell-based-architecture.md#terraform-examples)** - Complete infrastructure as code
+- **[Application Load Balancer](eks-cell-based-architecture.md#application-load-balancer)** - ALB resource configuration
 - **[Target Group](eks-cell-based-architecture.md#target-group)** - Target group with IP targeting
 - **[The Listener](eks-cell-based-architecture.md#the-listener)** - ALB listener configuration
 - **[The Output](eks-cell-based-architecture.md#the-output-integration-value)** - Target Group ARN output for integration
@@ -158,21 +160,23 @@ This repository contains comprehensive documentation for DevOps practices, focus
 ### Global Redis Cache
 - **[Key Implementation Patterns](eks-cell-based-architecture.md#1-key-implementation-patterns)** - Cross-zone and cross-region patterns
   - Topics: Cross-Zone (Single Region), Cross-Region Global Datastore
+- **[Valkey vs. Redis OSS Comparison](eks-cell-based-architecture.md#global-redis-cache)** - Technical comparison table
+  - Comparison: Throughput, threading model, memory efficiency, latency, pricing
 - **[Python Code](eks-cell-based-architecture.md#python-code)** - Redis client implementation example
 - **[Best Practices](eks-cell-based-architecture.md#best-practices)** - Engine choice, serverless vs node, persistence, security
 
 ### Zonal Read Isolation
 - **[Identify Node Endpoints](eks-cell-based-architecture.md#a-identify-node-endpoints)** - Direct node addressing for zone-specific reads
 - **[Configuration Injection per EKS Cluster](eks-cell-based-architecture.md#b-configuration-injection-per-eks-cluster)** - Environment variable injection
-- **[Terraform Example](eks-cell-based-architecture.md#terrafom-example)** - ElastiCache replication group with zonal isolation
-- **[Output Example](eks-cell-based-architecture.md#output-examle)** - Redis node endpoints output
+- **[Terraform Example](eks-cell-based-architecture.md#terraform-example)** - ElastiCache replication group with zonal isolation
+- **[Output Example](eks-cell-based-architecture.md#output-example)** - Redis node endpoints output
 
 ---
 
 ## Network Fundamentals
 
 ### TCP/IP Protocol
-- **[TCP/IP Protocol Overview](network.md#ip-protocol-overview)** - TCP and UDP protocols explained
+- **[TCP/IP Protocol Overview](network.md#tcpip-protocol-overview)** - TCP and UDP protocols explained
   - Topics: TCP three-way handshake, UDP characteristics, use cases
 - **[TCP/IP Model Layers](network.md#tcpip-model-layers)** - Five-layer network model
   - Layers: Application, Transport, Internet (Network), Data Link, Physical
@@ -198,6 +202,39 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)** - Comprehensive CNI data plane comparison
   - Technologies: eBPF, iptables, OVS, IPVS, VXLAN, VPC/VNet Native, DPDK/VPP
 - **[Technology Summaries](cni.md#technology-summaries)** - Overview of data plane technologies
+
+---
+
+## GitHub Actions
+
+### Efficiency & Best Practices
+- **[Performance and Cost Optimization](github-actions.md#performance-and-cost-optimization)** - Intelligent caching, matrix strategies, path filtering, job parallelization
+- **[Security Hardening](github-actions.md#security-hardening)** - Pin actions to commit SHAs, least privilege, OIDC for cloud access, environment protection
+
+### Advanced Workflow Management
+- **[Reusable Workflows](github-actions.md#reusable-workflows)** - Job-level workflow blueprints, versioning, vs. Composite Actions comparison
+  - Topics: Key features and syntax, tagging workflow versions, comparison table
+- **[Concurrency Groups](github-actions.md#concurrency-groups)** - Cost reduction and deployment conflict prevention
+  - Topics: Core functionality, common use cases, implementation examples (PR builds, sequential deployments)
+- **[Job Summaries](github-actions.md#job-summaries)** - Custom Markdown reports on workflow run pages
+  - Topics: How to create summaries, technical rules, advanced usage & tools
+- **[Local Testing with act](act-tool.md#local-testing-with-act-tool)** - Run GitHub Actions locally for faster iteration
+  - Topics: Installation, key features, limitations, usage examples, .actrc configuration
+- **[Upcoming Features in early 2026](github-actions.md#upcoming-features-in-early-2026)** - Timezone support, expression case function, UX improvements
+
+### Matrix Strategy
+- **[How it Works](github-actions.md#how-it-works)** - Cartesian product of matrix variables
+- **[Core Features](github-actions.md#core-features)** - Include & Exclude, Fail-Fast, Max Parallel, Dynamic Matrices
+- **[Key Use Cases](github-actions.md#key-use-cases)** - Cross-platform testing, version compatibility, test sharding, multi-arch builds
+- **[Limits to Remember](github-actions.md#limits-to-remember)** - Job cap (256 jobs), time limit (6 hours per job)
+
+### Multi-Arch Builds
+- **[Multi-Arch Builds](github-actions.md#multi-arch-builds)** - Matrix strategy for parallel platform builds with merge job pattern
+
+### Connection with AWS
+- **[Implementation Steps](github-actions.md#implementation-steps)** - OIDC provider setup and workflow configuration
+  - Topics: Configure AWS IAM, Update GitHub Workflow
+- **[Security Checklist](github-actions.md#security-checklist)** - Least privilege, environment protection, CloudTrail monitoring, self-hosted advantages
 
 ---
 
@@ -247,6 +284,9 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[eBPF vs. iptables Comparison](cni.md#ebpf-vs-iptables-comparison)**
 - **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)**
 
+### Redis/Valkey Comparison
+- **[Valkey vs. Redis OSS](eks-cell-based-architecture.md#global-redis-cache)** - Technical comparison table
+
 ---
 
 ## Contributing
@@ -265,14 +305,15 @@ When adding new documentation:
 ```
 devops-docs/
 ├── README.md                          # This index file
-├── aws.md                             # AWS services and best practices
-├── kubernetes.md                      # Kubernetes and EKS documentation
-├── terraform.md                       # Terraform tips and tricks
+├── act-tool.md                        # Local testing with act tool
 ├── argo.md                            # Argo CD and related tools
-├── eks-cell-based-architecture.md     # Cell-based architecture patterns
-├── network.md                         # Network fundamentals and TCP/IP
+├── aws.md                             # AWS services and best practices
 ├── cni.md                             # CNI plugins and eBPF
-└── github-actions.md                  # GitHub Actions (placeholder)
+├── eks-cell-based-architecture.md     # Cell-based architecture patterns
+├── github-actions.md                  # GitHub Actions workflows and best practices
+├── kubernetes.md                      # Kubernetes and EKS documentation
+├── network.md                         # Network fundamentals and TCP/IP
+└── terraform.md                       # Terraform tips and tricks
 ```
 
 ---

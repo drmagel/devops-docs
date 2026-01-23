@@ -73,9 +73,9 @@ locals {
 
 | Feature | Purpose | Input Type |
 |---------|---------|------------|
-| `locals {}` | Internal variable storage & calculation. | Any HCL expression. |
-| `for_each` | Creating multiple resources. | Map or Set of strings. |
-| `for` loop | Transforming or filtering data. | List, Map, Set, or Tuple. |
+| **`locals {}`** | Internal variable storage & calculation. | Any HCL expression. |
+| **`for_each`** | Creating multiple resources. | Map or Set of strings. |
+| **`for` loop** | Transforming or filtering data. | List, Map, Set, or Tuple. |
 
 
 ```hcl
@@ -117,10 +117,10 @@ resource "aws_instance" "app" {
 
 | Type | Ordered? | Duplicate Values? | Element Types | Common Use |
 |------|----------|-------------------|---------------|------------|
-| List | Yes | Yes | Same | Sequential resources |
-| Map | No | No (Unique keys) | Same | Configuration lookups |
-| Set | No | No (Unique values) | Same | Unique tag/ID lists |
-| Tuple | Yes | Yes | Mixed | Fixed positional data |
+| **List** | Yes | Yes | Same | Sequential resources |
+| **Map** | No | No (Unique keys) | Same | Configuration lookups |
+| **Set** | No | No (Unique values) | Same | Unique tag/ID lists |
+| **Tuple** | Yes | Yes | Mixed | Fixed positional data |
 
 ### Examples Snippets
 
@@ -275,9 +275,9 @@ resource "example_resource" "next_step" {
 **Summary of References**  
 | Target | Syntax |
 |--------|--------|
-| Specific Instance | `resource_type.name["key"]` |
-| All Instances (List) | `[for r in resource_type.name : r.attribute]` |
-| All Instances (Map) | `{for k, r in resource_type.name : k => r.attribute}` |
+| **Specific Instance** | `resource_type.name["key"]` |
+| **All Instances (List)** | `[for r in resource_type.name : r.attribute]` |
+| **All Instances (Map)** | `{for k, r in resource_type.name : k => r.attribute}` |
 
 
 ## Built-in Function
@@ -287,13 +287,13 @@ The [documentation](https://developer.hashicorp.com/terraform/language/functions
 
 | Category | Description | Functions |
 |----------|-------------|-----------|
-| Numeric Functions | Operations | `abs`, `ceil`, `floor`, `max`, `min` |
-| String Functions | Manipulation tools | `split`, `join`, `replace`, `trim`, `upper`, `lower` |
-| Collection Functions | Tools | `length`, `merge`, `lookup`, `flatten`, `element` |
-| Filesystem Functions | For reading or processing local files | `file`, `templatefile`, `abspath` |
-| IP Network Functions | Calculations for CIDR blocks | `cidrsubnet`, `cidrhost` |
-| Encoding & Crypto Functions | Handling data formats and security | `jsonencode`, `base64decode`, `sha256` |
-| Type Conversion | Converting between types | `tolist`, `tomap`, `toset`, `tostring` |  
+| **Numeric Functions** | Operations | `abs`, `ceil`, `floor`, `max`, `min` |
+| **String Functions** | Manipulation tools | `split`, `join`, `replace`, `trim`, `upper`, `lower` |
+| **Collection Functions** | Tools | `length`, `merge`, `lookup`, `flatten`, `element` |
+| **Filesystem Functions** | For reading or processing local files | `file`, `templatefile`, `abspath` |
+| **IP Network Functions** | Calculations for CIDR blocks | `cidrsubnet`, `cidrhost` |
+| **Encoding & Crypto Functions** | Handling data formats and security | `jsonencode`, `base64decode`, `sha256` |
+| **Type Conversion** | Converting between types | `tolist`, `tomap`, `toset`, `tostring` |  
 
 To experiment with any function and see its output in real-time using the **Terraform Console**:  
 1. Open terminal in a directory with a Terraform configuration.

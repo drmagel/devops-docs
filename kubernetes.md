@@ -1,11 +1,11 @@
-# Kubernetes tutorial. Short refrense.
+# Kubernetes tutorial. Short reference.
 
 ## Kubernetes main processes
 
 ### 1. Control Plane Processes (The Brain)
 
 These usually run on your master nodes and manage the state of the cluster.
-- **kube-apiserver**: The central hub. All components (and you, via kubectl) talk to this. it validates and configures data for objects like pods and services.
+- **kube-apiserver**: The central hub. All components (and you, via kubectl) talk to this. It validates and configures data for objects like pods and services.
 - **etcd**: The cluster's database. It is a key-value store that holds the "source of truth" for the entire cluster configuration.
 - **kube-scheduler**: The matchmaker. It watches for newly created pods with no assigned node and selects the best worker node for them based on resource availability.
 - **kube-controller-manager**: The regulator. It runs "control loops" that watch the state of the cluster and make changes to move the current state toward the desired state (e.g., if a pod dies, it starts a new one).
@@ -22,21 +22,22 @@ These run on every machine where your application containers are actually execut
 
 While not "core" binaries, no 2026 cluster functions without these running as pods:
 - **CoreDNS**: Handles internal naming (so Service A can find Service B by name).
-- **Metrics Server**: Collects CPU/RAM usage so the Horizontal Pod Autoscaler (HPA) knows when to scale your workers.
+- **Metrics Server**: Collects CPU/RAM usage so the **Horizontal Pod Autoscaler (HPA)** knows when to scale your workers.
 
 ### Summary Table
 
 | Process | Location | Primary Job |
 |---------|----------|-------------|
-| API Server | Control Plane | Communication & Authentication |
-| etcd | Control Plane | Persistent State Storage |
-| scheduler | Control Plane | Scheduling Pods to Nodes |
-| kubelet | Node | Executing & Monitoring Containers |
-| kube-proxy | Node | Networking & Service Load Balancing |
+| **API Server** | Control Plane | Communication & Authentication |
+| **etcd** | Control Plane | Persistent State Storage |
+| **scheduler** | Control Plane | Scheduling Pods to Nodes |
+| **kubelet** | Node | Executing & Monitoring Containers |
+| **kube-proxy** | Node | Networking & Service Load Balancing |
 
 ## Essential AWS EKS Plugins
 
 ### 1. Core Networking Add-ons
+
 These three are automatically provisioned with every EKS cluster and are indispensable for basic functionality: 
 - **Amazon VPC CNI**: Integrates Pod networking directly with your AWS VPC, assigning each Pod a real VPC IP address. In 2026, it is the primary tool for implementing Kubernetes Network Policies natively.
 - **CoreDNS**: Provides naming and service discovery within the cluster, allowing Pods to communicate using hostnames instead of IP addresses.
@@ -45,7 +46,7 @@ These three are automatically provisioned with every EKS cluster and are indispe
 ### 2. Storage and Infrastructure Plugins
 
 Essential for stateful applications and cloud-native scaling:
-- **AWS Load Balancer Controller**: Manages AWS Elastic Load Balancers (ALB/NLB). It is critical for exposing services to the internet via Ingress (ALB) or Service type: LoadBalancer (NLB).
+- **AWS Load Balancer Controller**: Manages **AWS Elastic Load Balancers (ALB/NLB)**. It is critical for exposing services to the internet via Ingress (ALB) or Service type: LoadBalancer (NLB).
 - **Amazon EBS CSI Driver**: Required for Pods to mount AWS EBS block storage volumes. It is now a mandatory separate installation if you need persistent volumes.
 - **Amazon EFS CSI Driver**: Enables shared, multi-AZ file storage for Pods using Amazon EFS.
 - **Karpenter**: Karpenter has superseded the legacy Cluster Autoscaler as the standard for just-in-time node provisioning, offering faster scaling and lower costs. 
@@ -59,8 +60,8 @@ Essential for stateful applications and cloud-native scaling:
 
 ### 4. Community Add-ons Catalog
 
-AWS now provides a unified management experience for popular open-source tools. You can install these directly from the EKS console with AWS-validated images: 
-- **Metrics Server**: Essential for HPA (Horizontal Pod Autoscaling) and KEDA (Kubernetes Event-driven Autoscaling).
+AWS now provides a unified management experience for popular open-source tools. You can install these directly from the EKS console with AWS-validated images:  
+- **Metrics Server**: Essential for **HPA** (Horizontal Pod Autoscaling) and **KEDA** (Kubernetes Event-driven Autoscaling).
 - **Cert-Manager**: Automates the management and issuance of TLS certificates.
 - **External-DNS**: Automatically updates your AWS Route 53 records based on Kubernetes Ingress/Service changes.
 
@@ -68,17 +69,17 @@ AWS now provides a unified management experience for popular open-source tools. 
 
 | Component | Job | Scaling Trigger |
 |-----------|-----|----------------|
-| HPA | Scales Pod count | Resource Usage (CPU/RAM) |
-| Metrics Server | Provides the data | Aggregate Node/Pod usage |
-| KEDA | Advanced scaling | External events (NATS, Redis, DB count) |
-| VPA | Scales Pod size | Adjusts CPU/RAM limits for a single pod |
-| Karpenter | Scales Nodes | Pending pods that need more hardware |
+| **HPA** | Scales Pod count | Resource Usage (CPU/RAM) |
+| **Metrics Server** | Provides the data | Aggregate Node/Pod usage |
+| **KEDA** | Advanced scaling | External events (NATS, Redis, DB count) |
+| **VPA** | Scales Pod size | Adjusts CPU/RAM limits for a single pod |
+| **Karpenter** | Scales Nodes | Pending pods that need more hardware |
 
 **Architect's Note**:
 
-Use:
-- **HPA** for API-Service (scaling on CPU)
-- **KEDA** for Workers (scaling on the number of pending tasks in your DB or NATS). Kubernetes HPA Documentation KEDA Official Site
+Use:  
+- **HPA**: for API-Service (scaling on CPU)
+- **KEDA**: for Workers (scaling on the number of pending tasks in your DB or NATS). Kubernetes HPA Documentation KEDA Official Site
 
 
 ## AWS EKS configurations
@@ -102,7 +103,7 @@ To maintain stability, the most common 2026 recommendation is a separate cluster
 For organizations with extreme reliability or regulatory requirements, clusters are distributed across multiple AWS accounts or regions. 
 - **Account-level Isolation**: Use a dedicated AWS account per cluster to isolate security boundaries and service quotas.
 - **Failover**: Multi-cluster/multi-region setups enable blue-green cluster upgrades and advanced disaster recovery.
-- **Secrets**: In 2026, the standard is to use AWS Secrets Manager with the External Secrets Operator to sync secrets from AWS securely across these clusters. 
+- **Secrets**: The standard is to use **AWS Secrets Manager** with the **External Secrets Operator** to sync secrets from AWS securely across these clusters. 
 
 ### 4. Networking Best Practices for Topologies
 
@@ -127,11 +128,11 @@ The most common failure in Multi-Zonal clusters involves Persistent Storage.
 AWS charges for all data that leaves one AZ and enters another.
 - **The Cost**: As of 2026, this is typically $0.01 per GB in each direction.
 - **The Limitation**: If your API-Service (Zone A) frequently queries your Database (Zone B), or your Worker pods pull large images from a registry in a different zone, your "Data Transfer" bill can eventually exceed your compute costs.
-- **Best Practice**: Enable Service Topology / Locality-Aware Routing to keep traffic within the same zone whenever possible.
+- **Best Practice**: Enable **Service Topology** / **Locality-Aware Routing** to keep traffic within the same zone whenever possible.
 
 #### 3. Increased Network Latency
 
-- **The Delay**: Cross-AZ communication adds approximately 1ms to 2ms of round-trip latency.
+- **The Delay**: Cross-AZ communication adds approximately **1ms** to **2ms** of round-trip latency.
 - **The Limitation**: While negligible for a single request, "chatty" microservice architectures that make 10-20 internal calls to fulfill one user request will see a cumulative performance hit of 20-40ms, which is visible to the end user.
 
 #### 4. The Single "Control Plane" Blast Radius
@@ -156,7 +157,7 @@ Kubernetes does not perfectly balance pods across zones by default.
 - **2026 Mitigation**: Use IPv6-based EKS clusters, which provide a virtually infinite address space and are the recommended 2026 standard for large-scale multi-zonal deployments.
 
 #### 8. Load Balancer Distribution
-- **The Limitation**: An AWS Application Load Balancer (ALB) may not distribute traffic evenly if the number of pods per zone is uneven.
+- **The Limitation**: An AWS **Application Load Balancer (ALB)** may not distribute traffic evenly if the number of pods per zone is uneven.
 - **The Fix**: You must ensure **Cross-Zone Load Balancing** is enabled on the Load Balancer, which can add a slight additional cost and latency.
 - **AWS EKS Best Practices**: Reliability Kubernetes: Topology Spread Constraints
 
@@ -164,11 +165,11 @@ Kubernetes does not perfectly balance pods across zones by default.
 
 | Feature | 1 Multi-AZ Cluster | 3 Independent Clusters |
 |---------|-------------------|------------------------|
-| Control Plane Cost | $73 / month | $219 / month |
-| Service Discovery | Native (CoreDNS) | Requires Service Mesh |
-| Upgrade Risk | Impact all 3 zones | Staggered (Safer) |
-| Isolation | Soft (Namespaces) | Hard (Physical) |
-| Resource Sharing | High Efficiency | Low Efficiency |
+| **Control Plane Cost** | $73 / month | $219 / month |
+| **Service Discovery** | Native (CoreDNS) | Requires Service Mesh |
+| **Upgrade Risk** | Impact all 3 zones | Staggered (Safer) |
+| **Isolation** | Soft (Namespaces) | Hard (Physical) |
+| **Resource Sharing** | High Efficiency | Low Efficiency |
 
 
 
@@ -176,7 +177,7 @@ Kubernetes does not perfectly balance pods across zones by default.
 
 ### AWS Service Account for pods: `EKS Pod Identity`
 
-the industry standard for connecting AWS permissions to a Kubernetes Pod is **EKS Pod Identity**. It is simpler and more scalable than the older **IRSA** (IAM Roles for Service Accounts) method because it eliminates the need to manage OIDC providers
+The industry standard for connecting AWS permissions to a Kubernetes Pod is **EKS Pod Identity**. It is simpler and more scalable than the older **IRSA** (IAM Roles for Service Accounts) method because it eliminates the need to manage OIDC providers
 
 #### 1. EKS Pod Identity Agent
 
@@ -214,7 +215,7 @@ metadata:
   namespace: dev
 ```
 
-#### Terrafrom example
+#### Terraform example
 
 ```hcl
 # The Trust Policy allowing EKS Pod Identity to use this role
@@ -289,7 +290,7 @@ This method uses an annotation directly on the Kubernetes ServiceAccount resourc
 - **Logic**: The EKS Pod Identity Webhook watches for a specific annotation. When it sees it, it injects the necessary AWS credentials into any pod using that service account.
 - **Infrastructure Requirements**: Requires an OIDC Identity Provider configured in IAM for your specific cluster.
 
-#### Terraform
+#### Terraform Examples
 
 ```hcl
 ## 1. OIDC Provider Configuration
@@ -371,10 +372,10 @@ spec:
 ### Comparison
 | Feature | EKS Pod Identity (New) | IRSA (Legacy) |
 |---------|------------------------|---------------|
-| Connection Method | EKS API Association | K8s Annotation (role-arn) |
-| IAM Trust | `pods.eks.amazonaws.com`| Cluster-specific OIDC URL |
-| Reusability | One role can serve multiple clusters | One role per OIDC provider (usually) |
-| Configuration | Simpler (No OIDC wiring) | Complex (Manual OIDC setup) |
+| **Connection Method** | EKS API Association | K8s Annotation (role-arn) |
+| **IAM Trust** | `pods.eks.amazonaws.com`| Cluster-specific OIDC URL |
+| **Reusability** | One role can serve multiple clusters | One role per OIDC provider (usually) |
+| **Configuration** | Simpler (No OIDC wiring) | Complex (Manual OIDC setup) |
 
 ## AWS EKS Application and Network Load Balancers
 
@@ -387,16 +388,19 @@ Consequently, AWS is pushing users toward the native **AWS Load Balancer Control
 The industry-wide successor to the "Ingress" resource is the Kubernetes Gateway API, which AWS fully supports in 2026. 
 | Feature | NGINX-based Ingress (Legacy) | AWS Load Balancer Controller (2026) |
 |---------|------------------------------|-------------------------------------|
-| Routing Engine | NGINX pods in the cluster | AWS ALB/NLB infrastructure |
-| Connection Method | NLB → NGINX Pod → App Pod | NLB/ALB → App Pod (Direct) |
-| Maintenance | Reaching EOL March 2026 | Fully managed by AWS |
-| API Standard | Ingress API (Frozen) | Gateway API (Modern) |
+| **Routing Engine** | NGINX pods in the cluster | AWS ALB/NLB infrastructure |
+| **Connection Method** | NLB → NGINX Pod → App Pod | NLB/ALB → App Pod (Direct) |
+| **Maintenance** | Reaching EOL March 2026 | Fully managed by AWS |
+| **API Standard** | Ingress API (Frozen) | Gateway API (Modern) |
 
 **The "New" NLB Capability: ALB-as-a-Target**  
 A key 2026 architectural pattern uses NLB in front of ALB. This is often used to replace custom NGINX setups that needed both static IPs and complex routing: 
 - **NLB (Entry)**: Provides a single static IP or PrivateLink support.
 - **ALB (Router)**: Acts as the target for the NLB, handling path-based routing and WAF security.
-- **Kubernetes**: The controller automatically wires these together when you define a Gateway or Ingress resource. 
+- **Kubernetes**: The controller automatically wires these together when you define a Gateway or Ingress resource.  
+
+**Ingress To API Gateway Migration Procedure**  
+Read [paper](https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress) and use [`ingress2gateway`](https://github.com/kubernetes-sigs/ingress2gateway) for automatic conversion.  
 
 ### NGINX Ingress Controller (Legacy)
 
@@ -460,13 +464,13 @@ spec:
 
 However, there are a few alternative approaches you could consider:
 
-- Use CloudFront Functions: Instead of Lambda@Edge, you can use CloudFront Functions to modify the request path. CloudFront Functions are lightweight and can perform simple path manipulations more efficiently than Lambda@Edge.
+- **Use CloudFront Functions**: Instead of Lambda@Edge, you can use CloudFront Functions to modify the request path. CloudFront Functions are lightweight and can perform simple path manipulations more efficiently than Lambda@Edge.
 
-- Modify your application logic: If possible, adjust your backend application to handle requests with the "/hi" segment and process them as if the segment wasn't there.
+- **Modify your application logic**: If possible, adjust your backend application to handle requests with the "/hi" segment and process them as if the segment wasn't there.
 
-- Use a reverse proxy: You could set up a reverse proxy (like NGINX) between your ALB and your application servers. This proxy can handle the path rewriting before forwarding requests to your application.
+- **Use a reverse proxy**: You could set up a reverse proxy (like NGINX) between your ALB and your application servers. This proxy can handle the path rewriting before forwarding requests to your application.
 
-- Content-based routing: While this doesn't remove the path segment, you could use the ALB's content-based routing feature to route requests with "/hi" to the same target group as requests without it. This way, your application would receive both types of requests and could handle them accordingly.
+- **Content-based routing**: While this doesn't remove the path segment, you could use the ALB's content-based routing feature to route requests with "/hi" to the same target group as requests without it. This way, your application would receive both types of requests and could handle them accordingly.
 
 ## Pod Topology Spread Constraints
 
@@ -476,7 +480,7 @@ Unlike **Pod Anti-Affinity**, which is binary (a Pod either can or cannot be co-
 ### Key Fields in a Constraint
 
 A PTSC is defined in the spec.topologySpreadConstraints section of a Pod manifest using these primary fields:  
-- **maxSkew**: The maximum allowed difference in the number of matching Pods between any two topology domains. For example, a maxSkew of 1 ensures a nearly equal distribution.
+- **maxSkew**: The maximum allowed difference in the number of matching Pods between any two topology domains. For example, a `maxSkew: 1` ensures a nearly equal distribution.
 - **topologyKey**: The node label that defines the domain (e.g., `kubernetes.io/hostname` for nodes or `topology.kubernetes.io/zone` for zones).
 - **whenUnsatisfiable**: Determines the scheduler's behavior if the constraint cannot be met:
   - **DoNotSchedule**: The Pod remains pending.
@@ -639,6 +643,15 @@ metadata:
 spec:
   type: ExternalName
   externalName: db-instance.xxxx.us-east-1b.rds.amazonaws.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rds-us-east-1c
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: db-instance.xxxx.us-east-1c.rds.amazonaws.com
 ```
 
 #### 2. Inject the Zone into your Application Pod
