@@ -8,11 +8,11 @@ Kubernetes **Container Network Interface (CNI)** plugins are categorized primari
 
 | CNI Plugin | Primary Technology | Key Characteristics | Best Use Case |
 |-----------|-------------------|---------------------|---------------|
-| Cilium | eBPF | High performance, deep L7 observability (Hubble), and identity-based security policies. | High-traffic, latency-sensitive production environments. |
-| Calico | BGP / iptables | Robust L3 routing, industry-standard network policy engine, and high scalability (10k+ nodes). | Enterprise-grade security and large-scale hybrid/multi-cloud deployments. |
-| Flannel | VXLAN | Minimalist, very easy to set up, but lacks network policy support and has overlay overhead. | Development, testing, or small clusters where simplicity is prioritized over security. |
-| Canal | Hybrid | Combines Flannel's simple networking with Calico's advanced network policy enforcement. | Teams needing a middle ground between simplicity and security policy. |
-| Weave Net | Mesh Overlay | Built-in encryption (IPsec) and an automatic peer-to-peer mesh that is highly resilient. | Smaller clusters requiring simple out-of-the-box traffic encryption. |
+| **Cilium** | eBPF | High performance, deep L7 observability (Hubble), and identity-based security policies. | High-traffic, latency-sensitive production environments. |
+| **Calico** | BGP / iptables | Robust L3 routing, industry-standard network policy engine, and high scalability (10k+ nodes). | Enterprise-grade security and large-scale hybrid/multi-cloud deployments. |
+| **Flannel** | VXLAN | Minimalist, very easy to set up, but lacks network policy support and has overlay overhead. | Development, testing, or small clusters where simplicity is prioritized over security. |
+| **Canal** | Hybrid | Combines Flannel's simple networking with Calico's advanced network policy enforcement. | Teams needing a middle ground between simplicity and security policy. |
+| **Weave Net** | Mesh Overlay | Built-in encryption (IPsec) and an automatic peer-to-peer mesh that is highly resilient. | Smaller clusters requiring simple out-of-the-box traffic encryption. |
 
 ### Specialized & Cloud-Native CNIs
 
@@ -50,30 +50,30 @@ The shift from iptables to eBPF is driven by the need for massive scalability in
 
 | Feature | iptables (Traditional) | eBPF (Modern) |
 |---------|------------------------|---------------|
-| Search Mechanism | Linear Traversal: Checks every rule sequentially until a match is found. | Hash Table Lookups: Direct, O(1) constant-time searches regardless of rule count. |
-| Performance | Performance degrades significantly as the number of rules/services grows. | High, consistent performance even with hundreds of thousands of rules. |
-| Latency | Higher latency due to packet movement through long rule chains. | Ultra-low latency by processing packets at the earliest possible kernel hook. |
-| Updates | Requires reloading the entire rule set for any single change, causing "blips". | Atomic Updates: Instantly updates specific entries in kernel memory (Maps) with no downtime. |
-| Observability | Limited; requires separate agents or sidecars to see what's happening. | Deep, built-in visibility (L3-L7) without extra overhead (e.g., Hubble). |
-| Security Scope | Primarily IP/port-based (L3/L4) firewall rules. | Identity-based and API-aware security (L3-L7) enforced in the kernel. |
-| Compatibility | Works on almost all Linux kernels, even very old ones. | Requires modern kernels (typically 5.2+) for full functionality. |
+| **Search Mechanism** | Linear Traversal: Checks every rule sequentially until a match is found. | Hash Table Lookups: Direct, O(1) constant-time searches regardless of rule count. |
+| **Performance** | Performance degrades significantly as the number of rules/services grows. | High, consistent performance even with hundreds of thousands of rules. |
+| **Latency** | Higher latency due to packet movement through long rule chains. | Ultra-low latency by processing packets at the earliest possible kernel hook. |
+| **Updates** | Requires reloading the entire rule set for any single change, causing "blips". | Atomic Updates: Instantly updates specific entries in kernel memory (Maps) with no downtime. |
+| **Observability** | Limited; requires separate agents or sidecars to see what's happening. | Deep, built-in visibility (L3-L7) without extra overhead (e.g., Hubble). |
+| **Security Scope** | Primarily IP/port-based (L3/L4) firewall rules. | Identity-based and API-aware security (L3-L7) enforced in the kernel. |
+| **Compatibility** | Works on almost all Linux kernels, even very old ones. | Requires modern kernels (typically 5.2+) for full functionality. |
 
 ### Kubernetes CNI Technology Comparison
 
-Kubernetes CNI (Container Network Interface) plugins are primarily classified by their **data plane technology**. While many modern plugins are transitioning to eBPF for performance and observability, several established plugins still rely on `iptables`, `IPVS`, or specialized userspace/hardware technologies
+**Kubernetes CNI (Container Network Interface)** plugins are primarily classified by their **data plane technology**. While many modern plugins are transitioning to eBPF for performance and observability, several established plugins still rely on `iptables`, `IPVS`, or specialized userspace/hardware technologies
 
 | CNI Plugin | Primary Data Plane | Secondary/Alternative | Key Characteristics in 2026 |
 |-----------|-------------------|---------------------|------------------------------|
-| Cilium | eBPF | — | Native eBPF from the start; provides deep L7 visibility (Hubble) and identity-based security. |
-| Calico | iptables | eBPF, IPVS, VPP | Highly versatile; uses BGP for routing and supports an advanced eBPF data plane for performance. |
-| Antrea | Open vSwitch (OVS) | — | Optimized for VMware environments; uses OVS for high-performance L2/L3 networking and security. |
-| Flannel | VXLAN | host-gw, WireGuard | The simplest CNI; uses basic Linux bridging and VXLAN overlays with no network policy support. |
-| Kube-router | IPVS | iptables | Uses IPVS for service load balancing and BGP for pod networking; lean and performance-focused. |
-| Canal | VXLAN (Flannel) | iptables (Calico) | A hybrid that uses Flannel for the data path and Calico's iptables rules for network policies. |
-| OVN-Kubernetes | OVS / OVN | — | Enterprise SDN that can bypass the CPU for established flows; common in Red Hat OpenShift. |
-| Weave Net | VXLAN | — | Uses a mesh overlay with gossip-based discovery; best for smaller clusters requiring easy encryption. |
-| AWS/Azure/GKE CNI | VPC/VNet Native | — | Uses the cloud provider's native networking (e.g., VPC ENIs) for direct, routable IP addresses. |
-| Userspace CNI | DPDK / VPP | — | Designed for specialized high-throughput/low-latency needs (Telcos); runs networking in userspace. |  
+| **Cilium** | eBPF | — | Native eBPF from the start; provides deep L7 visibility (Hubble) and identity-based security. |
+| **Calico** | iptables | eBPF, IPVS, VPP | Highly versatile; uses BGP for routing and supports an advanced eBPF data plane for performance. |
+| **Antrea** | Open vSwitch (OVS) | — | Optimized for VMware environments; uses OVS for high-performance L2/L3 networking and security. |
+| **Flannel** | VXLAN | host-gw, WireGuard | The simplest CNI; uses basic Linux bridging and VXLAN overlays with no network policy support. |
+| **Kube-router** | IPVS | iptables | Uses IPVS for service load balancing and BGP for pod networking; lean and performance-focused. |
+| **Canal** | VXLAN (Flannel) | iptables (Calico) | A hybrid that uses Flannel for the data path and Calico's iptables rules for network policies. |
+| **OVN-Kubernetes** | OVS / OVN | — | Enterprise SDN that can bypass the CPU for established flows; common in Red Hat OpenShift. |
+| **Weave Net** | VXLAN | — | Uses a mesh overlay with gossip-based discovery; best for smaller clusters requiring easy encryption. |
+| **AWS/Azure/GKE CNI** | VPC/VNet Native | — | Uses the cloud provider's native networking (e.g., VPC ENIs) for direct, routable IP addresses. |
+| **Userspace CNI** | DPDK / VPP | — | Designed for specialized high-throughput/low-latency needs (Telcos); runs networking in userspace. |  
 
 **Technology Summaries**  
 

@@ -1,17 +1,17 @@
-# AWS Services And Best Paracticies
+# AWS Services And Best Practices
 
 ## VPC
 
 ### Connect VPC to Internet
 
-The foundational resources required to expose an AWS VPC to the internet remain consistent, with an emphasis on Internet Gateways for public access and NAT Gateways for secure outbound connectivity
+The foundational resources required to expose an AWS VPC to the internet remain consistent, with an emphasis on **Internet Gateways** for public access and **NAT Gateways** for secure outbound connectivity
 
 #### Essential Connectivity Resources
 
 To enable internet access, you must deploy and configure these core components: 
 - **Internet Gateway (IGW)**: This is the "main gate" for your VPC. It must be created and explicitly attached to your VPC to allow any communication with the internet.
-- **Public Subnet**: A subnet becomes "public" only when its Route Table contains a route (typically 0.0.0.0/0) targeting the attached Internet Gateway.
-- **Elastic IP (EIP)**: A static, public IPv4 address. You will need one for a NAT Gateway or to manually assign to a specific EC2 instance that must be reachable directly from the internet. 
+- **Public Subnet**: A subnet becomes "public" only when its Route Table contains a route (typically `0.0.0.0/0`) targeting the attached Internet Gateway.
+- **Elastic IP (EIP)**: A static, public IPv4 address. You will need one for a **NAT Gateway** or to manually assign to a specific EC2 instance that must be reachable directly from the internet. 
 
 #### Resources for Secure Outbound Access
 
@@ -23,12 +23,12 @@ If you have sensitive resources (like databases) in a Private Subnet that need t
 Opening a VPC to the internet requires multiple layers of defense-in-depth: 
 - **Security Groups**: Act as a virtual firewall for your instances, controlling traffic at the resource level.
 - **Network ACLs (NACLs)**: Act as a firewall for the subnet, providing a stateless second layer of security.
-- **AWS WAF & Shield**: Highly recommended in 2026 to protect internet-facing Application Load Balancers (ALBs) from web exploits and DDoS attacks. 
+- **AWS WAF & Shield**: Highly recommended in 2026 to protect **internet-facing Application Load Balancers (ALBs)** from web exploits and DDoS attacks. 
 
 ### Transit Gateway
 
-AWS Transit Gateway (TGW) is the standard hub-and-spoke router for interconnecting multiple VPCs and on-premises networks.  
-As of mid-2025, AWS introduced Native Network Firewall integration, which fundamentally changed how "firewall rules" are applied to Transit Gateway traffic. 
+**AWS Transit Gateway (TGW)** is the standard hub-and-spoke router for interconnecting multiple VPCs and on-premises networks.  
+As of mid-2025, AWS introduced **Native Network Firewall** integration, which fundamentally changed how "firewall rules" are applied to **Transit Gateway** traffic. 
 
 #### Centralized Traffic Inspection
 
@@ -44,13 +44,13 @@ Security is implemented using **AWS Network Firewall Policies**, which consist o
   - **Function**: Standard 5-tuple filtering (Source/Dest IP, Port, Protocol).
   - **Behavior**: Fast, but "dumb"—they do not track session state. Best for high-volume, simple "Allow" or "Drop" actions based on CIDR blocks.  
 - **Stateful Rules**:
-  - **Function**: Deep Packet Inspection (DPI) using the **Suricata engine**.
-  - **Capabilities**: Domain filtering (e.g., allow *.aws.com but block others), TLS inspection, and signature-based Intrusion Prevention (IPS). 
+  - **Function**: **Deep Packet Inspection (DPI)** using the **Suricata engine**.
+  - **Capabilities**: Domain filtering (e.g., allow `*.aws.com` but block others), TLS inspection, and signature-based **Intrusion Prevention (IPS)**. 
 
 #### Implementing "Rules" via Routing
 
 In a Transit Gateway architecture, "firewall rules" are only effective if traffic is forced through the firewall. This is handled by **TGW Route Tables**: 
-- **Spoke Route Table**: All "spoke" VPCs (your apps) are associated with a route table that has a default route (0.0.0.0/0) pointing to the Firewall Attachment.
+- **Spoke Route Table**: All "spoke" VPCs (your apps) are associated with a route table that has a default route (`0.0.0.0/0`) pointing to the Firewall Attachment.
 - **Inspection/Return Route Table**: The Firewall Attachment itself is associated with a separate route table that contains routes back to the specific destination VPCs. 
 
 #### Traditional "Firewall" Layers  
@@ -62,14 +62,14 @@ While the Network Firewall handles the heavy lifting, standard AWS security reso
 
 ## Lambda
 
-In 2026, AWS Lambda remains the core of serverless architecture, recently enhanced with features like Durable Functions for long-running workflows and Lambda Managed Instances for specialized compute  
+In 2026, AWS Lambda remains the core of serverless architecture, recently enhanced with features like **Durable Functions** for long-running workflows and **Lambda Managed Instances** for specialized compute  
 
 ### Lambda's Roles and Policies
 
 Lambda security is defined by two primary types of permissions: 
 - **Execution Role (IAM Role)**: This "identity card" allows the Lambda function to access other AWS services once it is running.
-  - **Trust Policy**: Must explicitly allow lambda.amazonaws.com to assume the role.
-  - **Permissions Policy**: An inline or managed policy attached to the role that grants specific actions (e.g., s3:GetObject, logs:CreateLogGroup).
+  - **Trust Policy**: Must explicitly allow `lambda.amazonaws.com` to assume the role.
+  - **Permissions Policy**: An inline or managed policy attached to the role that grants specific actions (e.g., `s3:GetObject`, `logs:CreateLogGroup`).
 - **Resource-Based Policy**: Attached directly to the function, this policy defines who or what can invoke the Lambda. For example, S3 needs a resource-based policy to "knock on the door" and start your function
 
 ```hcl
@@ -144,11 +144,11 @@ resource "aws_lambda_permission" "allow_s3_bucket" {
 ### Lambda's Triggering Options
 
 A trigger is an event source that initiates your function. Modern options include:  
-- **S3 Event Notification**s: Triggers whenever an object is created, deleted, or modified (e.g., s3:ObjectCreated:*).
-- **Message Queues/Streams**: Integration with SQS (now with 3x faster scaling in 2026), DynamoDB Streams, Kinesis, and Amazon MSK.
-- **Synchronous Triggers**: API Gateway (now supporting response streaming for large payloads) and Application Load Balancer.
-- **Schedules**: Using Amazon EventBridge to run functions at specific intervals (cron/rate).
-- **Async Invocations**: In 2026, the maximum payload size for asynchronous triggers (like S3 or EventBridge) has increased to 1 MB. 
+- **S3 Event Notification**s: Triggers whenever an object is created, deleted, or modified (e.g., `s3:ObjectCreated:*`).
+- **Message Queues/Streams**: Integration with **SQS** (now with 3x faster scaling in 2026), **DynamoDB Streams**, **Kinesis**, and **Amazon MSK**.
+- **Synchronous Triggers**: **API Gateway** (now supporting response streaming for large payloads) and **Application Load Balancer**.
+- **Schedules**: Using **Amazon EventBridge** to run functions at specific intervals (cron/rate).
+- **Async Invocations**: In 2026, the maximum payload size for asynchronous triggers (like S3 or EventBridge) has increased to **1 MB**. 
 
 
 ### Asynchronous Invocations
@@ -159,13 +159,13 @@ When you invoke a function asynchronously, the caller receives a 202 Accepted re
 
 #### Key Features in 2026
 
-- **Increased Payload Size**: As of early 2026, the maximum payload size for async invocations is 1 MB (up from 256 KB in previous years), allowing for larger event data without needing to store it in S3 first.
+- **Increased Payload Size**: As of early 2026, the maximum payload size for async invocations is **1 MB** (up from 256 KB in previous years), allowing for larger event data without needing to store it in S3 first.
 - **Managed Retry Logic**: AWS automatically retries failed async executions. By default, it retries two more times (total of 3 attempts) with exponential backoff.
 - **Event Age Filtering**: You can configure the Maximum Event Age (up to 6 hours). If the event sits in the internal queue longer than this, it is discarded rather than executed, preventing "stale" processing.
 
 #### Destinations (The modern DLQ)
 
-While Dead Letter Queues (DLQ) still exist, **Lambda Destinations** are the standard in 2026 for handling execution results. You can route results to different services based on success or failure:
+While **Dead Letter Queues (DLQ)** still exist, **Lambda Destinations** are the standard in 2026 for handling execution results. You can route results to different services based on success or failure:
 - **On Success**: Send a record of completion to **EventBridge** or **SQS**.
 - **On Failure**: Send the full execution context and error stack trace to an **SQS queue** or **SNS topic** for debugging or automated recovery.
 
@@ -223,8 +223,8 @@ An AWS Organization consists of a **Management Account** and multiple **Member A
 ### IAM Identities
 
 The way you manage users has changed to support multi-account security:
-- **Workforce Identities (The New Standard)**: Instead of creating a "User" inside every account, you create one identity in the IAM Identity Center (attached to the Management Account or a delegated admin).
-- **Permission Sets**: These act like "Group Templates." You define a policy (e.g., AdministratorAccess) and assign it to a user or group across multiple accounts.
+- **Workforce Identities (The New Standard)**: Instead of creating a "User" inside every account, you create one identity in the **IAM Identity Center** (attached to the **Management Account** or a delegated admin).
+- **Permission Sets**: These act like "Group Templates." You define a policy (e.g., `AdministratorAccess`) and assign it to a user or group across multiple accounts.
 - **IAM Roles (The "How")**: When a user logs in, they "assume" a role in the target account. This role is temporary and uses short-lived credentials, which is significantly more secure than the old-fashioned permanent **Access Keys**. 
 
 ### Roles vs. Users vs. Groups
@@ -241,7 +241,7 @@ In an Organization, the "Firewall for IAM" is the Service Control Policy (SCP).
 
 - **What they do**: SCPs set the maximum permissions for all identities (including the Root user) in a member account.
 - **Example**: You can apply an SCP to a "Production" account that prevents anyone—even an Administrator—from deleting S3 buckets or disabling CloudTrail.
-- **Logic**: Even if a local IAM Role has FullAccess, if the Organization SCP denies an action, the action is blocked. 
+- **Logic**: Even if a local IAM Role has `FullAccess`, if the Organization SCP denies an action, the action is blocked.  
 
 ### Management Best Practices
 
