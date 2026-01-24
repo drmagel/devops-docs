@@ -1,17 +1,18 @@
 # DevOps Documentation Index
 
-This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
+This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, WAF security, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
 
 ## Table of Contents
 
-- [AWS Services](#aws-services)
-- [Kubernetes & EKS](#kubernetes--eks)
-- [Terraform](#terraform)
 - [Argo](#argo)
-- [EKS Cell-Based Architecture](#eks-cell-based-architecture)
-- [Network Fundamentals](#network-fundamentals)
+- [AWS Services](#aws-services)
 - [CNI (Container Network Interface)](#cni-container-network-interface)
+- [EKS Cell-Based Architecture](#eks-cell-based-architecture)
 - [GitHub Actions](#github-actions)
+- [Kubernetes & EKS](#kubernetes--eks)
+- [Network Fundamentals](#network-fundamentals)
+- [Terraform](#terraform)
+- [WAF & Security](#waf--security)
 
 ---
 
@@ -205,6 +206,27 @@ This repository contains comprehensive documentation for DevOps practices, focus
 
 ---
 
+## WAF & Security
+
+### F5 Advanced WAF
+- **[F5 WAF Overview](waf.md#f5-advanced-waf)** - Enterprise WAF solution with advanced threat protection
+  - Topics: Vulnerability protection, advanced defense, data safeguarding, deployment versatility
+- **[Programming Languages for F5 WAF](waf.md#programming-and-scripting-languages)** - Tcl, Python, JavaScript, YAML/JSON for WAF customization
+
+### AWS WAF
+- **[AWS WAF Overview](waf.md#aws-waf)** - Cloud-native, fully managed Web Application Firewall
+  - Topics: Web ACLs, rule language, automation approaches
+- **[Key Features for 2026](waf.md#key-features-for-2026)** - Managed Rule Groups, Bot Control, Fraud Control, Real-Time Monitoring
+- **[Integration Methods](waf.md#integration)** - ALB, EKS Ingress Controller, Amazon API Gateway
+  - Integration details: Direct association, one-click setup, declarative configuration, auto-reconciliation
+
+### Amazon CloudFront
+- **[CloudFront Overview](waf.md#amazon-cloudfront)** - Global Content Delivery Network with edge security
+  - Topics: Edge caching, regional edge caches, programmable edge, Lambda@Edge
+- **[Key Features for 2026](waf.md#key-features-for-2026)** - CloudFront Functions, Lambda@Edge, Viewer mTLS, AWS Shield & WAF integration, Blue/Green deployment
+
+---
+
 ## GitHub Actions
 
 ### Efficiency & Best Practices
@@ -313,7 +335,8 @@ devops-docs/
 ├── github-actions.md                  # GitHub Actions workflows and best practices
 ├── kubernetes.md                      # Kubernetes and EKS documentation
 ├── network.md                         # Network fundamentals and TCP/IP
-└── terraform.md                       # Terraform tips and tricks
+├── terraform.md                       # Terraform tips and tricks
+└── waf.md                             # Web Application Firewall (F5, AWS WAF, CloudFront)
 ```
 
 ---
