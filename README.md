@@ -1,6 +1,6 @@
 # DevOps Documentation Index
 
-This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, WAF security, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
+This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, WAF security, secrets management, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
 
 ## Table of Contents
 
@@ -11,8 +11,32 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - [GitHub Actions](#github-actions)
 - [Kubernetes & EKS](#kubernetes--eks)
 - [Network Fundamentals](#network-fundamentals)
+- [Secrets Management](#secrets-management)
 - [Terraform](#terraform)
 - [WAF & Security](#waf--security)
+
+---
+
+## Argo
+
+### Core Argo Products
+- **[Overview](argo.md#core-argo-products)** - Argo CD, Argo Workflows, Argo Rollouts, Argo Events
+
+### Argo CD
+- **[Core Concepts & Patterns](argo.md#core-concepts--patterns)** - App-of-Apps Pattern, ApplicationSets
+- **[Best Practices](argo.md#best-practices)** - Repository separation, directory-based environments, secret management, SSO & RBAC, sync waves, drift detection
+
+### ApplicationSet
+- **[ApplicationSet Overview](argo.md#argo-applicationset)** - Generator, Template, Controller concepts
+- **[Primary Generators](argo.md#primary-generators)** - Git, Cluster, List, SCM Provider, Matrix generators
+- **[ApplicationSet vs. App-of-Apps](argo.md#applicationset-vs-app-of-apps)** - Comparison table
+- **[ApplicationSet Manifest Example](argo.md#applicationset-manifest-example-matrix-generator-manifest)** - Matrix Generator with Git and Cluster generators
+
+### Cluster Registration
+- **[Method 1: Argo CD CLI](argo.md#method-1-argo-cd-cli)** - Command-line cluster registration
+- **[Method 2: Declarative Secret](argo.md#method-2-declarative-secret)** - Kubernetes Secret-based registration
+- **[Key Considerations](argo.md#key-considerations)** - Security, service account tokens, ApplicationSets, local cluster
+- **[Declarative Auto Registration](argo.md#declarative-auto-registration)** - Local cluster discovery setup
 
 ---
 
@@ -34,6 +58,99 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[Roles vs. Users vs. Groups](aws.md#roles-vs-users-vs-groups)** - Comparison table of IAM resources
 - **[Service Control Policies (SCPs)](aws.md#security-governance-service-control-policies-scps)** - Security governance and policy enforcement
 - **[Multi-Account Setup](aws.md#multi-account-setup)** - Account types and their purposes (Management, Security, Identity, Log Archive)
+
+---
+
+## CNI (Container Network Interface)
+
+### CNI Overview
+- **[CNI Types and Characteristics](cni.md#cnis)** - Overview of CNI plugins and selection criteria
+- **[Popular CNI Types & Characteristics](cni.md#popular-cni-types--characteristics)** - Comparison table of major CNI plugins
+  - CNIs: Cilium, Calico, Flannel, Canal, Weave Net
+- **[Specialized & Cloud-Native CNIs](cni.md#specialized--cloud-native-cnis)** - Cloud provider CNIs and specialized solutions
+- **[Core Network Models](cni.md#core-network-models)** - Overlay vs Underlay networking
+- **[Selection Criteria](cni.md#selection-criteria)** - Security, performance, scalability, kernel support considerations
+
+### eBPF
+- **[What is eBPF?](cni.md#what-is-ebpf)** - Extended Berkeley Packet Filter explained
+  - Topics: Safety, efficiency, hook-based architecture
+- **[eBPF vs. iptables Comparison](cni.md#ebpf-vs-iptables-comparison)** - Feature comparison table
+  - Comparison: Search mechanism, performance, latency, updates, observability, security scope, compatibility
+- **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)** - Comprehensive CNI data plane comparison
+  - Technologies: eBPF, iptables, OVS, IPVS, VXLAN, VPC/VNet Native, DPDK/VPP
+- **[Technology Summaries](cni.md#technology-summaries)** - Overview of data plane technologies
+
+---
+
+## EKS Cell-Based Architecture
+
+### Architecture Pattern
+- **[Shared ALB](eks-cell-based-architecture.md#the-architecture-pattern-shared-alb)** - Central Application Load Balancer for multiple EKS clusters
+
+### Implementation
+- **[Central Infrastructure](eks-cell-based-architecture.md#a-central-infrastructure)** - ALB and Target Group setup
+- **[Cluster-Level Configuration](eks-cell-based-architecture.md#b-cluster-level-configuration)** - TargetGroupBinding setup
+- **[Service-Level Configuration](eks-cell-based-architecture.md#c-service-level-configuration)** - Service and TargetGroupBinding manifests
+
+### Load Balancing
+- **[Achieving Round-Robin](eks-cell-based-architecture.md#achieving-round-robin)** - ALB round-robin distribution
+- **[Health-Check Driven Failover](eks-cell-based-architecture.md#why-this-is-the-expert-choice)** - Automatic failover capabilities
+- **[Critical Caveat: Sticky Sessions](eks-cell-based-architecture.md#critical-caveat-the-sticky-session-trap)** - Session stickiness considerations
+- **[Summary of Component Jobs](eks-cell-based-architecture.md#summary-of-component-jobs)** - Component responsibilities table
+
+### Terraform Infrastructure
+- **[Terraform Examples](eks-cell-based-architecture.md#terraform-examples)** - Complete infrastructure as code
+- **[Application Load Balancer](eks-cell-based-architecture.md#application-load-balancer)** - ALB resource configuration
+- **[Target Group](eks-cell-based-architecture.md#target-group)** - Target group with IP targeting
+- **[The Listener](eks-cell-based-architecture.md#the-listener)** - ALB listener configuration
+- **[The Output](eks-cell-based-architecture.md#the-output-integration-value)** - Target Group ARN output for integration
+
+### Global Redis Cache
+- **[Key Implementation Patterns](eks-cell-based-architecture.md#1-key-implementation-patterns)** - Cross-zone and cross-region patterns
+  - Topics: Cross-Zone (Single Region), Cross-Region Global Datastore
+- **[Valkey vs. Redis OSS Comparison](eks-cell-based-architecture.md#global-redis-cache)** - Technical comparison table
+  - Comparison: Throughput, threading model, memory efficiency, latency, pricing
+- **[Python Code](eks-cell-based-architecture.md#python-code)** - Redis client implementation example
+- **[Best Practices](eks-cell-based-architecture.md#best-practices)** - Engine choice, serverless vs node, persistence, security
+
+### Zonal Read Isolation
+- **[Identify Node Endpoints](eks-cell-based-architecture.md#a-identify-node-endpoints)** - Direct node addressing for zone-specific reads
+- **[Configuration Injection per EKS Cluster](eks-cell-based-architecture.md#b-configuration-injection-per-eks-cluster)** - Environment variable injection
+- **[Terraform Example](eks-cell-based-architecture.md#terraform-example)** - ElastiCache replication group with zonal isolation
+- **[Output Example](eks-cell-based-architecture.md#output-example)** - Redis node endpoints output
+
+---
+
+## GitHub Actions
+
+### Efficiency & Best Practices
+- **[Performance and Cost Optimization](github-actions.md#performance-and-cost-optimization)** - Intelligent caching, matrix strategies, path filtering, job parallelization
+- **[Security Hardening](github-actions.md#security-hardening)** - Pin actions to commit SHAs, least privilege, OIDC for cloud access, environment protection
+
+### Advanced Workflow Management
+- **[Reusable Workflows](github-actions.md#reusable-workflows)** - Job-level workflow blueprints, versioning, vs. Composite Actions comparison
+  - Topics: Key features and syntax, tagging workflow versions, comparison table
+- **[Concurrency Groups](github-actions.md#concurrency-groups)** - Cost reduction and deployment conflict prevention
+  - Topics: Core functionality, common use cases, implementation examples (PR builds, sequential deployments)
+- **[Job Summaries](github-actions.md#job-summaries)** - Custom Markdown reports on workflow run pages
+  - Topics: How to create summaries, technical rules, advanced usage & tools
+- **[Local Testing with act](act-tool.md#local-testing-with-act-tool)** - Run GitHub Actions locally for faster iteration
+  - Topics: Installation, key features, limitations, usage examples, .actrc configuration
+- **[Upcoming Features in early 2026](github-actions.md#upcoming-features-in-early-2026)** - Timezone support, expression case function, UX improvements
+
+### Matrix Strategy
+- **[How it Works](github-actions.md#how-it-works)** - Cartesian product of matrix variables
+- **[Core Features](github-actions.md#core-features)** - Include & Exclude, Fail-Fast, Max Parallel, Dynamic Matrices
+- **[Key Use Cases](github-actions.md#key-use-cases)** - Cross-platform testing, version compatibility, test sharding, multi-arch builds
+- **[Limits to Remember](github-actions.md#limits-to-remember)** - Job cap (256 jobs), time limit (6 hours per job)
+
+### Multi-Arch Builds
+- **[Multi-Arch Builds](github-actions.md#multi-arch-builds)** - Matrix strategy for parallel platform builds with merge job pattern
+
+### Connection with AWS
+- **[Implementation Steps](github-actions.md#implementation-steps)** - OIDC provider setup and workflow configuration
+  - Topics: Configure AWS IAM, Update GitHub Workflow
+- **[Security Checklist](github-actions.md#security-checklist)** - Least privilege, environment protection, CloudTrail monitoring, self-hosted advantages
 
 ---
 
@@ -82,6 +199,63 @@ This repository contains comprehensive documentation for DevOps practices, focus
 
 ---
 
+## Network Fundamentals
+
+### TCP/IP Protocol
+- **[TCP/IP Protocol Overview](network.md#tcpip-protocol-overview)** - TCP and UDP protocols explained
+  - Topics: TCP three-way handshake, UDP characteristics, use cases
+- **[TCP/IP Model Layers](network.md#tcpip-model-layers)** - Five-layer network model
+  - Layers: Application, Transport, Internet (Network), Data Link, Physical
+  - Protocol table: [TCP/IP Model Layers Table](network.md#tcpip-model-layers)
+
+---
+
+## Secrets Management
+
+### AWS Secrets Manager Integration
+
+#### Core Integration Methods
+- **[Secrets Store CSI Driver](vault-secrets.md#secrets-store-csi-driver-native-aws-recommendation)** - Native AWS recommendation for pod-level secret mounting
+  - Topics: How it works, key benefits, best use cases
+- **[AWS Secrets Manager Agent](vault-secrets.md#aws-secrets-manager-agent-http-based-access)** - HTTP-based sidecar/DaemonSet access
+  - Topics: Agent architecture, caching, dynamic refresh for high-scale apps
+- **[External Secrets Operator (ESO)](vault-secrets.md#external-secrets-operator-eso)** - Community-driven Kubernetes operator
+  - Topics: Bridge pattern, continuous polling, legacy app support
+
+#### Step-by-Step Integration Guide
+- **[CSI Driver Method Setup](vault-secrets.md#step-by-step-integration-guide-csi-driver-method)** - Complete integration walkthrough
+  - Topics: Identity & access configuration, driver installation, SecretProviderClass, deployment manifest updates
+
+### HashiCorp Vault (Open Source)
+
+#### Key Features
+- **[Vault Overview](vault-secrets.md#external-vault---open-source-project)** - Dynamic secrets, identity-based access, audit logging, leasing & rotation
+- **[Key Features of Vault (2026)](vault-secrets.md#key-features-of-vault-2026)** - Secure storage, dynamic secrets, identity-based access, compliance features
+
+#### Integration with AWS EKS
+- **[Vault Agent Sidecar Injector](vault-secrets.md#vault-agent-sidecar-injector-most-popular)** - Most popular integration method
+  - Topics: Mutating admission webhook, sidecar injection, shared memory volumes, real-time updates
+- **[Vault Secrets Operator (VSO)](vault-secrets.md#vault-secrets-operator-native-sync)** - Native Kubernetes Secret synchronization
+  - Topics: etcd replication, environment variable support, legacy app compatibility
+- **[Secrets Store CSI Driver (Vault Provider)](vault-secrets.md#secrets-store-csi-driver-vault-provider)** - Multi-cloud standardization
+  - Topics: Volume mounting, container creation phase, cross-cloud consistency
+- **[External Secrets Operator (ESO)](vault-secrets.md#external-secrets-operator-eso)** - Community tool for multi-backend integration
+  - Topics: Unified secret management, multiple backend support, ESO ecosystem
+
+### 1Password SaaS
+
+#### Integration Methods
+- **[1Password Overview](vault-secrets.md#1password-saas)** - Enterprise password and secrets management
+  - Topics: Extended Access Management, SaaS discovery, automated lifecycle, developer tools
+- **[1Password Connect Kubernetes Operator](vault-secrets.md#1password-connect-kubernetes-operator-sync-method)** - Most robust 2026 method
+  - Topics: Connect Server bridge, OnePasswordItem CRD, auto-restart on secret updates, Kubernetes Secret sync
+- **[1Password Secrets Injector](vault-secrets.md#1password-secrets-injector-direct-injection)** - Direct runtime injection
+  - Topics: Mutating admission webhook, environment variable injection, etcd bypass, attack surface reduction
+- **[External Secrets Operator (ESO)](vault-secrets.md#external-secrets-operator-eso-with-1password)** - ESO backend integration
+  - Topics: Connect API, unified secret management, multi-provider aggregation
+
+---
+
 ## Terraform
 
 ### Locals and Loops
@@ -112,100 +286,6 @@ This repository contains comprehensive documentation for DevOps practices, focus
 
 ---
 
-## Argo
-
-### Core Argo Products
-- **[Overview](argo.md#core-argo-products)** - Argo CD, Argo Workflows, Argo Rollouts, Argo Events
-
-### Argo CD
-- **[Core Concepts & Patterns](argo.md#core-concepts--patterns)** - App-of-Apps Pattern, ApplicationSets
-- **[Best Practices](argo.md#best-practices)** - Repository separation, directory-based environments, secret management, SSO & RBAC, sync waves, drift detection
-
-### ApplicationSet
-- **[ApplicationSet Overview](argo.md#argo-applicationset)** - Generator, Template, Controller concepts
-- **[Primary Generators](argo.md#primary-generators)** - Git, Cluster, List, SCM Provider, Matrix generators
-- **[ApplicationSet vs. App-of-Apps](argo.md#applicationset-vs-app-of-apps)** - Comparison table
-- **[ApplicationSet Manifest Example](argo.md#applicationset-manifest-example-matrix-generator-manifest)** - Matrix Generator with Git and Cluster generators
-
-### Cluster Registration
-- **[Method 1: Argo CD CLI](argo.md#method-1-argo-cd-cli)** - Command-line cluster registration
-- **[Method 2: Declarative Secret](argo.md#method-2-declarative-secret)** - Kubernetes Secret-based registration
-- **[Key Considerations](argo.md#key-considerations)** - Security, service account tokens, ApplicationSets, local cluster
-- **[Declarative Auto Registration](argo.md#declarative-auto-registration)** - Local cluster discovery setup
-
----
-
-## EKS Cell-Based Architecture
-
-### Architecture Pattern
-- **[Shared ALB](eks-cell-based-architecture.md#the-architecture-pattern-shared-alb)** - Central Application Load Balancer for multiple EKS clusters
-
-### Implementation
-- **[Central Infrastructure](eks-cell-based-architecture.md#a-central-infrastructure)** - ALB and Target Group setup
-- **[Cluster-Level Configuration](eks-cell-based-architecture.md#b-cluster-level-configuration)** - TargetGroupBinding setup
-- **[Service-Level Configuration](eks-cell-based-architecture.md#c-service-level-configuration)** - Service and TargetGroupBinding manifests
-
-### Load Balancing
-- **[Achieving Round-Robin](eks-cell-based-architecture.md#achieving-round-robin)** - ALB round-robin distribution
-- **[Health-Check Driven Failover](eks-cell-based-architecture.md#why-this-is-the-expert-choice)** - Automatic failover capabilities
-- **[Critical Caveat: Sticky Sessions](eks-cell-based-architecture.md#critical-caveat-the-sticky-session-trap)** - Session stickiness considerations
-- **[Summary of Component Jobs](eks-cell-based-architecture.md#summary-of-component-jobs)** - Component responsibilities table
-
-### Terraform Infrastructure
-- **[Terraform Examples](eks-cell-based-architecture.md#terraform-examples)** - Complete infrastructure as code
-- **[Application Load Balancer](eks-cell-based-architecture.md#application-load-balancer)** - ALB resource configuration
-- **[Target Group](eks-cell-based-architecture.md#target-group)** - Target group with IP targeting
-- **[The Listener](eks-cell-based-architecture.md#the-listener)** - ALB listener configuration
-- **[The Output](eks-cell-based-architecture.md#the-output-integration-value)** - Target Group ARN output for integration
-
-### Global Redis Cache
-- **[Key Implementation Patterns](eks-cell-based-architecture.md#1-key-implementation-patterns)** - Cross-zone and cross-region patterns
-  - Topics: Cross-Zone (Single Region), Cross-Region Global Datastore
-- **[Valkey vs. Redis OSS Comparison](eks-cell-based-architecture.md#global-redis-cache)** - Technical comparison table
-  - Comparison: Throughput, threading model, memory efficiency, latency, pricing
-- **[Python Code](eks-cell-based-architecture.md#python-code)** - Redis client implementation example
-- **[Best Practices](eks-cell-based-architecture.md#best-practices)** - Engine choice, serverless vs node, persistence, security
-
-### Zonal Read Isolation
-- **[Identify Node Endpoints](eks-cell-based-architecture.md#a-identify-node-endpoints)** - Direct node addressing for zone-specific reads
-- **[Configuration Injection per EKS Cluster](eks-cell-based-architecture.md#b-configuration-injection-per-eks-cluster)** - Environment variable injection
-- **[Terraform Example](eks-cell-based-architecture.md#terraform-example)** - ElastiCache replication group with zonal isolation
-- **[Output Example](eks-cell-based-architecture.md#output-example)** - Redis node endpoints output
-
----
-
-## Network Fundamentals
-
-### TCP/IP Protocol
-- **[TCP/IP Protocol Overview](network.md#tcpip-protocol-overview)** - TCP and UDP protocols explained
-  - Topics: TCP three-way handshake, UDP characteristics, use cases
-- **[TCP/IP Model Layers](network.md#tcpip-model-layers)** - Five-layer network model
-  - Layers: Application, Transport, Internet (Network), Data Link, Physical
-  - Protocol table: [TCP/IP Model Layers Table](network.md#tcpip-model-layers)
-
----
-
-## CNI (Container Network Interface)
-
-### CNI Overview
-- **[CNI Types and Characteristics](cni.md#cnis)** - Overview of CNI plugins and selection criteria
-- **[Popular CNI Types & Characteristics](cni.md#popular-cni-types--characteristics)** - Comparison table of major CNI plugins
-  - CNIs: Cilium, Calico, Flannel, Canal, Weave Net
-- **[Specialized & Cloud-Native CNIs](cni.md#specialized--cloud-native-cnis)** - Cloud provider CNIs and specialized solutions
-- **[Core Network Models](cni.md#core-network-models)** - Overlay vs Underlay networking
-- **[Selection Criteria](cni.md#selection-criteria)** - Security, performance, scalability, kernel support considerations
-
-### eBPF
-- **[What is eBPF?](cni.md#what-is-ebpf)** - Extended Berkeley Packet Filter explained
-  - Topics: Safety, efficiency, hook-based architecture
-- **[eBPF vs. iptables Comparison](cni.md#ebpf-vs-iptables-comparison)** - Feature comparison table
-  - Comparison: Search mechanism, performance, latency, updates, observability, security scope, compatibility
-- **[Kubernetes CNI Technology Comparison](cni.md#kubernetes-cni-technology-comparison)** - Comprehensive CNI data plane comparison
-  - Technologies: eBPF, iptables, OVS, IPVS, VXLAN, VPC/VNet Native, DPDK/VPP
-- **[Technology Summaries](cni.md#technology-summaries)** - Overview of data plane technologies
-
----
-
 ## WAF & Security
 
 ### F5 Advanced WAF
@@ -224,39 +304,6 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[CloudFront Overview](waf.md#amazon-cloudfront)** - Global Content Delivery Network with edge security
   - Topics: Edge caching, regional edge caches, programmable edge, Lambda@Edge
 - **[Key Features for 2026](waf.md#key-features-for-2026)** - CloudFront Functions, Lambda@Edge, Viewer mTLS, AWS Shield & WAF integration, Blue/Green deployment
-
----
-
-## GitHub Actions
-
-### Efficiency & Best Practices
-- **[Performance and Cost Optimization](github-actions.md#performance-and-cost-optimization)** - Intelligent caching, matrix strategies, path filtering, job parallelization
-- **[Security Hardening](github-actions.md#security-hardening)** - Pin actions to commit SHAs, least privilege, OIDC for cloud access, environment protection
-
-### Advanced Workflow Management
-- **[Reusable Workflows](github-actions.md#reusable-workflows)** - Job-level workflow blueprints, versioning, vs. Composite Actions comparison
-  - Topics: Key features and syntax, tagging workflow versions, comparison table
-- **[Concurrency Groups](github-actions.md#concurrency-groups)** - Cost reduction and deployment conflict prevention
-  - Topics: Core functionality, common use cases, implementation examples (PR builds, sequential deployments)
-- **[Job Summaries](github-actions.md#job-summaries)** - Custom Markdown reports on workflow run pages
-  - Topics: How to create summaries, technical rules, advanced usage & tools
-- **[Local Testing with act](act-tool.md#local-testing-with-act-tool)** - Run GitHub Actions locally for faster iteration
-  - Topics: Installation, key features, limitations, usage examples, .actrc configuration
-- **[Upcoming Features in early 2026](github-actions.md#upcoming-features-in-early-2026)** - Timezone support, expression case function, UX improvements
-
-### Matrix Strategy
-- **[How it Works](github-actions.md#how-it-works)** - Cartesian product of matrix variables
-- **[Core Features](github-actions.md#core-features)** - Include & Exclude, Fail-Fast, Max Parallel, Dynamic Matrices
-- **[Key Use Cases](github-actions.md#key-use-cases)** - Cross-platform testing, version compatibility, test sharding, multi-arch builds
-- **[Limits to Remember](github-actions.md#limits-to-remember)** - Job cap (256 jobs), time limit (6 hours per job)
-
-### Multi-Arch Builds
-- **[Multi-Arch Builds](github-actions.md#multi-arch-builds)** - Matrix strategy for parallel platform builds with merge job pattern
-
-### Connection with AWS
-- **[Implementation Steps](github-actions.md#implementation-steps)** - OIDC provider setup and workflow configuration
-  - Topics: Configure AWS IAM, Update GitHub Workflow
-- **[Security Checklist](github-actions.md#security-checklist)** - Least privilege, environment protection, CloudTrail monitoring, self-hosted advantages
 
 ---
 
@@ -336,6 +383,7 @@ devops-docs/
 ├── kubernetes.md                      # Kubernetes and EKS documentation
 ├── network.md                         # Network fundamentals and TCP/IP
 ├── terraform.md                       # Terraform tips and tricks
+├── vault-secrets.md                   # Secrets management (AWS Secrets Manager, Vault, 1Password)
 └── waf.md                             # Web Application Firewall (F5, AWS WAF, CloudFront)
 ```
 

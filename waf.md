@@ -14,7 +14,7 @@ It acts as a reverse proxy that filters and monitors HTTP/HTTPS traffic between 
 
 - **Tcl (Tool Command Language)**: The core scripting language for F5 devices is **Tcl**, used to write **iRules**. iRules allow administrators to programmatically inspect, intercept, and modify traffic passing through the WAF in real-time.
 - **Python**: Primarily used for external automation and management. F5 provides SDKs and modules that allow developers to interact with the WAF’s REST API using Python for tasks like automated policy deployment and configuration in CI/CD pipelines.
-- **JavaScript** (Node.js): Newer F5 platforms support iRules LX, which allows developers to use Node.js and JavaScript to extend the functionality of the WAF beyond what standard Tcl iRules can do.
+- **JavaScript (Node.js)**: Newer F5 platforms support iRules LX, which allows developers to use Node.js and JavaScript to extend the functionality of the WAF beyond what standard Tcl iRules can do.
 - **YAML/JSON**: Used for declarative configuration, where the WAF's security policies and settings are defined in structured data files for automated, consistent deployments.  
 
 ## AWS WAF
