@@ -1,10 +1,11 @@
 # DevOps Documentation Index
 
-This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, WAF security, secrets management, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
+This repository contains comprehensive documentation for DevOps practices, focusing on AWS, Kubernetes, Terraform, ArgoCD, GitHub Actions, WAF security, secrets management, autoscaling, and related technologies. This document serves as a navigation guide to help you quickly find information on specific topics.
 
 ## Table of Contents
 
 - [Argo](#argo)
+- [Autoscaling](#autoscaling)
 - [AWS Services](#aws-services)
 - [CNI (Container Network Interface)](#cni-container-network-interface)
 - [EKS Cell-Based Architecture](#eks-cell-based-architecture)
@@ -37,6 +38,41 @@ This repository contains comprehensive documentation for DevOps practices, focus
 - **[Method 2: Declarative Secret](argo.md#method-2-declarative-secret)** - Kubernetes Secret-based registration
 - **[Key Considerations](argo.md#key-considerations)** - Security, service account tokens, ApplicationSets, local cluster
 - **[Declarative Auto Registration](argo.md#declarative-auto-registration)** - Local cluster discovery setup
+
+---
+
+## Autoscaling
+
+### Comparison Summary
+- **[Cluster Autoscaler vs Karpenter](autoscaliers.md#comparison-summary)** - Feature comparison table
+  - Comparison: Orchestration, instance choice, speed, complexity
+
+### AWS Auto Scaling Groups (ASGs)
+- **[ASGs and Kubernetes](autoscaliers.md#aws-auto-scaling-groups-asgs-and-kubernetes)** - Role of ASGs in EKS, managed node groups
+- **[Cluster Autoscaler (CA)](autoscaliers.md#the-link-cluster-autoscaler-ca)** - Standard tool connecting Kubernetes to ASGs
+  - Topics: How it works, discovery mechanism, scale-down behavior
+
+### Cluster Autoscaler Installation
+- **[IAM Configuration](autoscaliers.md#iam-configuration)** - Required permissions for CA
+- **[IAM Policy Setup](autoscaliers.md#1-create-iam-policy)** - IAM Role Trust Policy and Permission Policy
+- **[IRSA Configuration](autoscaliers.md#1-create-iam-policy)** - IAM Role for Service Account setup
+  - Topics: ServiceAccount annotation, eksctl quick setup, ASG tagging for auto-discovery
+
+### Karpenter
+- **[Karpenter Overview](autoscaliers.md#karpenter)** - High-performance AWS autoscaler
+  - Topics: Bypassing ASGs, EC2 Fleet API, speed advantages
+- **[Installation](autoscaliers.md#installation)** - Helm installation procedure
+- **[Component Architecture](autoscaliers.md#connection-between-ec2nodeclass-nodepool-and-deployment)** - EC2NodeClass, NodePool, and Deployment relationships
+- **[EC2NodeClass](autoscaliers.md#ec2nodeclass-infrastructure-settings)** - Infrastructure settings (AMI, role, network selectors)
+- **[NodePool](autoscaliers.md#nodepool-scheduling-logic)** - Scheduling logic and disruption settings
+- **[Deployment Integration](autoscaliers.md#deployment-matches-the-nodepool-name)** - Connecting deployments to NodePools via nodeSelector
+
+### Workload Autoscaling
+- **[Horizontal Pod Autoscaler (HPA)](autoscaliers.md#other-scaling-types-in-kubernetes)** - CPU/RAM-based pod replica scaling
+- **[Vertical Pod Autoscaler (VPA)](autoscaliers.md#other-scaling-types-in-kubernetes)** - Adjusting pod CPU/RAM requests
+- **[Event-Driven Autoscaling (KEDA)](autoscaliers.md#other-scaling-types-in-kubernetes)** - External event-based scaling (SQS, etc.)
+- **[KEDA Installation](autoscaliers.md#keda-installation-procedure)** - Terraform IAM role setup and Helm installation
+  - Topics: IAM role configuration, OIDC provider setup, Helm deployment
 
 ---
 
@@ -314,6 +350,7 @@ This repository contains comprehensive documentation for DevOps practices, focus
 
 ### Autoscaling Components
 - **[Metrics-Based Autoscalers](kubernetes.md#metrics-based-autoscalers)**
+- **[Cluster Autoscaler vs Karpenter](autoscaliers.md#comparison-summary)** - Infrastructure autoscaling comparison
 
 ### Topology Comparison
 - **[Multi-AZ vs Multi-Cluster](kubernetes.md#multiple-cluster-topology-limitations-cell-based-architecture)**
@@ -376,6 +413,7 @@ devops-docs/
 ├── README.md                          # This index file
 ├── act-tool.md                        # Local testing with act tool
 ├── argo.md                            # Argo CD and related tools
+├── autoscaliers.md                    # Autoscaling (Cluster Autoscaler, Karpenter, HPA, VPA, KEDA)
 ├── aws.md                             # AWS services and best practices
 ├── cni.md                             # CNI plugins and eBPF
 ├── eks-cell-based-architecture.md     # Cell-based architecture patterns
