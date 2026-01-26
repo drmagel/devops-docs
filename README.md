@@ -225,6 +225,10 @@ This repository contains comprehensive documentation for DevOps practices, focus
   - Comparison table: [NGINX vs AWS Load Balancer Controller](kubernetes.md#the-architecture-gateway-api)
 - **[NGINX Ingress Controller (Legacy)](kubernetes.md#nginx-ingress-controller-legacy)** - Legacy implementation examples
 - **[AWS Load Balancer Controller (2026 Standard)](kubernetes.md#aws-load-balancer-controller-2026-standard)** - Modern implementation with Gateway API
+- **[Ingress vs TargetGroupBinding](kubernetes.md#the-choice-between-ingress-and-targetgroupbinding-tgb)** - Choosing between Ingress and TGB for existing Target Groups
+  - Topics: Internal vs external routing management, comparison table, use cases
+- **[Port and Hostname Configuration](kubernetes.md#port-and-hostname-for-targetgroup)** - Target Group port and hostname setup
+  - Topics: Port configuration, hostname routing, Ingress vs TargetGroupBinding differences
 
 ### Pod Management
 - **[Pod Topology Spread Constraints](kubernetes.md#pod-topology-spread-constraints)** - Distribution control across failure domains
@@ -360,6 +364,7 @@ This repository contains comprehensive documentation for DevOps practices, focus
 
 ### Load Balancer Comparison
 - **[NGINX vs AWS Load Balancer Controller](kubernetes.md#the-architecture-gateway-api)**
+- **[Ingress vs TargetGroupBinding](kubernetes.md#key-comparison-table)** - Comparison table for routing management approaches
 
 ### IAM Resources
 - **[Roles vs Users vs Groups](aws.md#roles-vs-users-vs-groups)**

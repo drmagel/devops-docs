@@ -109,7 +109,7 @@ For organizations with extreme reliability or regulatory requirements, clusters 
 
 IPv6 Adoption: Move to IPv6 clusters if you face IPv4 address exhaustion in your VPC.
 - **Cilium**: For advanced security and performance, consider using Cilium as your CNI for eBPF-based networking and security.
-- **Private Endpoints**: Always use private cluster endpoints to ensure your Kubernetes API is not exposed to the public internet
+- **Private Endpoints**: Always use private cluster endpoints to ensure your Kubernetes API is not exposed to the public internet.
 
 ## Multi-Zonal Topology
 
@@ -471,6 +471,59 @@ However, there are a few alternative approaches you could consider:
 - **Use a reverse proxy**: You could set up a reverse proxy (like NGINX) between your ALB and your application servers. This proxy can handle the path rewriting before forwarding requests to your application.
 
 - **Content-based routing**: While this doesn't remove the path segment, you could use the ALB's content-based routing feature to route requests with "/hi" to the same target group as requests without it. This way, your application would receive both types of requests and could handle them accordingly.
+
+### The Choice Between Ingress and TargetGroupBinding (TGB)
+
+The choice between **Ingress** and **TargetGroupBinding (TGB)** when using **an existing Target Group** depends on where you want to manage your routing logic (Layer 7 rules like paths and host headers).
+
+**Summary: Which one to use?**  
+
+- Use **Ingress** if you want to manage routing rules inside Kubernetes using standard manifests.  
+- Use **TargetGroupBinding** if you want to manage routing rules outside Kubernetes (e.g., via Terraform or AWS Console).
+
+#### When to use Ingress (Internal Routing Management)
+
+Use an **Ingress** resource when you want the **AWS Load Balancer Controller** to manage the **ALB Listeners** and **Rules**, even if the **Target Group** itself was created externally.  
+
+- **Scenario**: You have a shared ALB managed by Terraform, but you want developers to define their own URL paths (e.g., /api or /app) in their Kubernetes manifests.  
+- **How it works**: You point the Ingress backend to an existing Target Group ARN using an annotation.
+- **Benefit**: Centralizes routing logic within the cluster while maintaining an external lifecycle for the physical ALB  
+
+#### When to use TargetGroupBinding (External Routing Management)  
+
+Use a **TargetGroupBinding** when you want to provision the entire load balancer infrastructure (ALB, Listeners, Rules, and Target Groups) completely outside of Kubernetes.  
+
+- **Scenario**: Your Infrastructure-as-Code (Terraform) has already defined that example.com/login goes to TargetGroup-A. You just need Kubernetes to register your Pods into that specific TargetGroup-A.
+- **How it works**: You create a TGB resource that maps a Kubernetes Service to the pre-existing Target Group ARN.
+- **Benefit**: Decouples infrastructure from the application. The ALB and routing rules remain intact even if you delete your Kubernetes Ingress or Service resources  
+
+#### Key Comparison Table  
+
+| Feature | Ingress (with existing TG) | TargetGroupBinding |
+|---------|---------------------------|-------------------|
+| **Who manages ALB Rules?** | Kubernetes (via Ingress rules) | AWS Console/Terraform |
+| **Who manages Pod Registration?** | ALB Controller (internally uses TGB) | ALB Controller (via explicit TGB) |
+| **Primary Use Case** | Path/Host-based routing managed in K8s | Multi-cluster traffic or pure IaC management |
+| **Protocol Support** | Only Layer 7 (ALB) | Layer 4 (NLB) and Layer 7 (ALB) |  
+
+### Port and Hostname for TargetGroup
+
+When creating an AWS Target Group for use with an Application Load Balancer (ALB) and Kubernetes, the Port and Hostname are configured at different stages and in different locations.  
+
+#### Where to set the Port  
+
+You set the port in the Target Group configuration. 
+- **Port during creation**: When you create a Target Group (via AWS Console, CLI, or Terraform), you define a "default" port (e.g., port 80 or 8080).
+- **Target-specific override**: When the **AWS Load Balancer Controller** registers your Pods as targets, it typically overrides the target group's default port to match the `containerPort` or Service port defined in your Kubernetes manifests.
+- **Important**: For IP-mode (the modern standard for EKS), the Target Group must be set to `target-type: ip`  
+
+#### Where to set the Hostname  
+
+A Target Group itself does not have a hostname. Instead, the hostname is used to route traffic to the Target Group. You set this in the ALB Listener Rules.  
+- **If using Ingress**: You define the `hostname` (e.g., `api.example.com`) in the `rules.host` section of your Kubernetes Ingress manifest. The AWS Load Balancer Controller will then automatically create a Host Header rule on the ALB to route traffic for that hostname to your Target Group.
+- **If using TargetGroupBinding only**: You must manually (or via Terraform/CLI) create a `Listener Rule` on the AWS ALB. This rule specifies:
+  - **Condition**: Host-header = `myapp.example.com`
+  - **Action**: Forward to `Target Group ARN` 
 
 ## Pod Topology Spread Constraints
 
